@@ -223,6 +223,12 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
         print(f'Observing group deletion failed - {e}')
         print()
 
+    # List exposures
+    response = api_request(f'/programs/{program_token}/exposures')
+    print(f'All exposures for {program_token}:')
+    for exp in response['exposure']:
+        print(f"{exp['obsid']} (OG{exp['observing_group_context']['observing_group_label']}, {exp['target']['name']})")
+    print()
 
 # List programs
 response = api_request('programs/lite')
