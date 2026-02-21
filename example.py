@@ -231,7 +231,7 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     print()
 
 # List programs
-response = api_request('programs/lite')
+response = api_request('programs')
 for program in response['entity']:
     program_data = program['program_data']
     program_token = program_data['token']
