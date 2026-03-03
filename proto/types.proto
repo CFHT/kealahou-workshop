@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package cfhtapi.types;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/common";
+option java_package = "edu.hawaii.cfht.protos.types";
+option java_outer_classname = "TypesProtos";
+option java_multiple_files = true;
+option java_generic_services = true;
+
+import "protoc_gen_openapiv2/options/annotations.proto";
+
+enum InstrumentType {
+    UNKNOWN = 0;
+    CFH12K = 1;
+    MEGACAM = 2;
+    WIRCAM = 3;
+    ESPADONS = 4;
+    SITELLE = 5;
+    SPIROU = 6;
+    WENAOKEAO = 7;
+}
+
+enum ExposureType {
+    OBJECT = 0;
+
+    TARGET = 1 [deprecated = true];
+    SKY = 2;
+
+    DARK = 3;
+    FLAT = 4;
+    SNAP = 5;
+
+    BIAS = 6;
+    FOCUS = 7;
+    ALIGN = 8;
+    COMPARISON = 9;
+
+    ACQUIRE = 10;
+
+    FABRY_PEROT = 11;
+    TWILIGHT_FLATS = 12;
+
+    PHOTOMETRY = 13;
+
+    SFOCUS = 14;
+}
+
+message Header {
+    string name = 1;
+    string value = 2;
+}
+
+message SkyCoordinate {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Sky Coordinate"
+            description: "Specify an on sky location via right ascension and declination."
+        }
+    };
+
+    /* Right Ascension, in degrees */
+    double ra = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        title: "Right Ascension"
+        description: "Right Ascension in degrees."
+        minimum: 0
+        maximum: 360
+        type: NUMBER
+    }];
+    /* Declination, in degrees */
+    double dec = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        title: "Declination"
+        description: "Declination in degrees."
+        minimum: -90
+        maximum: 90
+        type: NUMBER
+    }];
+}
+
+message OffsetCoordinate {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Offset Coordinate"
+            description: "Specify an on sky location relative to another known position."
+        }
+    };
+
+    /* Right ascension, in degrees */
+    double ra_offset = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        title: "Right Ascension Offset"
+        description: "Offset in the Right Ascension axis in arcsec of degrees."
+        minimum: -1296000
+        maximum: 1296000
+        type: NUMBER
+    }];
+    /* Declination, in degrees */
+    double dec_offset = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        title: "Declination Offset"
+        description: "Offset in the Declination axis in arcsec of degrees."
+        minimum: -324000
+        maximum: 324000
+        type: NUMBER
+    }];
+
+    int64 exposure_number = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        title: "Exposure number"
+        description: "Exposure number"
+        minimum: 0
+        maximum: 99
+        type: NUMBER
+    }];
+}
+
+// Used for primary database fields in sybase
+// Should be parsed as a BigInteger
+message BigInteger {
+    string value = 1;
+}
+
+// Sybase uses big decimal for "precise" fields, but double should be good enough in new system for all use cases
+message BigDecimal {
+    string value = 1;
+}
+
+message DoubleMinMax {
+    double min = 1;
+    double max = 2;
+}
+
+enum DurationUnit {
+    DAYS = 0;
+    HOURS = 1;
+    MINUTES = 2;
+    SECONDS = 3;
+}
+
+message Duration {
+    int64 millis = 1;
+
+    /* Only needed for rendering UI, should display the duration using the units specified.
+     * If unset, assume DAYS */
+    DurationUnit display_unit = 2;
+}
+
+message TimeRangeData {
+    int64 start_millis = 1;
+
+    /* end is not inclusive */
+    int64 end_millis = 2;
+}

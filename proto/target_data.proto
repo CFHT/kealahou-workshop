@@ -1,0 +1,251 @@
+syntax = "proto3";
+
+/* just a note, all timing (etime, itime, overheads) data is changed to int64 and will express time in milliseconds */
+
+package cfhtapi.observing.persistence;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/persistence";
+option java_package = "edu.hawaii.cfht.protos.observing.persistence";
+option java_multiple_files = true;
+option java_generic_services = true;
+
+import "cfhtapi/observing/persistence/pointing_offset.proto";
+import "cfhtapi/observing/persistence/finding_chart_data.proto";
+import "cfhtapi/observing/persistence/observing_template_data.proto";
+import "cfhtapi/observing/persistence/target_identifiers.proto";
+import "cfhtapi/options.proto";
+import "cfhtapi/types.proto";
+import "google/protobuf/wrappers.proto";
+
+/* Stored in targets table in column target_data */
+message TargetData {
+
+    /* Unique identifier for the target.
+     *
+     * When creating a new target, this will be inferred from the request data
+     * if left blank here.
+     *
+     * Must begin with the program token followed by a dash, e.g.
+     * 20AE01-0123456789 */
+    string token = 1;
+
+    /* Name for the target entered by PI, or primary name as resolved by CDS.
+     *
+     * Will become OBJECT in the FITS header.
+     *
+     * Required.
+     * Length limited to 39 characters.
+     * Allowed characters are letters, numbers, spaces, or any of:
+     * !@#$%^&*()_-+.,?/[]<> */
+    string name = 2;
+
+    /* Index of the target within the program, set by the system automatically.
+     * Used for reference to targets in communications with QSO staff.
+     *
+     * storage: transient
+     * api_visibility: read only */
+    int32 label = 3 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+
+    /* Increments when this object updates.
+     *
+     * storage: transient
+     * api_visibility: read only, incremented by the server */
+    int32 version = 4 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+
+    /* Target at fixed coordinates, including any provided proper motion. */
+    message FixedTarget {
+        /* Coordinate for this target, specified in ICRS (ep=J2000). */
+        cfhtapi.types.SkyCoordinate coordinate = 1;
+
+        /* The rate of change in angular coordinates for the target. */
+        message ProperMotion {
+            /* Motion in the right ascension axis in milliarcseconds/year. */
+            double ra_mas = 1;
+            /* Motion in the declination axis in milliarcseconds/year. */
+            double dec_mas = 2;
+        }
+
+        /* Proper motions for this target. */
+        ProperMotion proper_motion = 2;
+
+        /* Internal use only.
+         * The coordinate of the target at the time of observation,
+         * specified in ICRS (ep=J2000).
+         *
+         * storage: transient
+         * api_visibility: operations read only */
+        cfhtapi.types.SkyCoordinate computed_coordinate = 3 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 4];
+
+        /* Expected radial velocity of the target in kilometers/second.
+         *
+         * Used for targets observed with SPIRou.*/
+        google.protobuf.DoubleValue estimated_radial_velocity_kmps = 4;
+    }
+
+    /* Target with motion defined by a list of ephemerides. */
+    message MovingTarget {
+        /* A time and corresponding coordinate. */
+        message Ephemeris {
+            /* Modified Julian date when the target is at this coordinate. */
+            double mjd = 1;
+
+            /* Coordinate for this target at this time, specified in
+             * ICRS (ep=J2000). */
+            cfhtapi.types.SkyCoordinate coordinate = 2;
+
+            /* Internal use only.
+             * The coordinate of the target at the time of observation,
+             * specified in ICRS (ep=J2000).
+             *
+             * storage: transient
+             * api_visibility: operations read only */
+            cfhtapi.types.SkyCoordinate computed_coordinate = 3 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 4];
+        }
+
+        /* The ephemerides that define the path of motion for the target.
+         *
+         * Must be provided using topocentric astrometric coordinates.
+         * Do not provide apparent coordinates.
+         * CFHT strongly recommends the use of JPL Horizons System for
+         * generating the proper coordinates. CFHT's observatory code is T14.
+         *
+         * At least five distinct positions must be provided that span the
+         * desired observing period. The first position should be well in
+         * advance of the observation. The positions do not need to be
+         * uniformly sampled throughout the desired observing period.
+         *
+         * The points will be interpolated to determine the position of the
+         * target at the time of observation, at which point there must be
+         * at least one ephemeris point defined in the past, and at least
+         * four defined in the future. */
+        repeated Ephemeris ephemeris_point = 1;
+    }
+
+    /* A target can either be a fixed target, or a moving target. */
+    oneof target_subtype {
+        /* Used for a target at fixed coordinates, including any provided
+         * proper motion. */
+        FixedTarget fixed_target = 5;
+
+        /* Used for a target with motion defined by a list of ephemerides. */
+        MovingTarget moving_target = 6;
+    }
+
+    /* Estimated/measured magnitude values per-band.
+     * Each value is optional, except where noted. */
+    message Magnitude {
+        /* U-band magnitude */
+        google.protobuf.DoubleValue U = 1;
+
+        /* B-band magnitude */
+        google.protobuf.DoubleValue B = 2;
+
+        /* V-band magnitude
+         *
+         * Required for targets observed with ESPaDonS. */
+        google.protobuf.DoubleValue V = 3;
+
+        /* R-band magnitude */
+        google.protobuf.DoubleValue R = 4;
+
+        /* I-band magnitude */
+        google.protobuf.DoubleValue I = 5;
+
+        /* G-band magnitude */
+        google.protobuf.DoubleValue G = 6;
+
+        /* J-band magnitude */
+        google.protobuf.DoubleValue J = 7;
+
+        /* H-band magnitude
+         *
+         * Required for targets observed with SPIRou. */
+        google.protobuf.DoubleValue H = 8;
+
+        /* K-band magnitude */
+        google.protobuf.DoubleValue K = 9;
+
+        /* u-band magnitude */
+        google.protobuf.DoubleValue uu = 10;
+
+        /* g-band magnitude */
+        google.protobuf.DoubleValue gg = 11;
+
+        /* r-band magnitude */
+        google.protobuf.DoubleValue rr = 12;
+
+        /* i-band magnitude */
+        google.protobuf.DoubleValue ii = 13;
+
+        /* z-band magnitude */
+        google.protobuf.DoubleValue zz = 14;
+
+        /* AB magnitude
+         *
+         * Required for targets observed with MegaCam. */
+        google.protobuf.DoubleValue AB = 15;
+    }
+
+    /* The magnitude of the target for bands which are known. */
+    Magnitude magnitude = 7;
+
+    /* The estimated/measured effective temperature, in Kelvin.
+     *
+     * Required for targets observed with SPIRou or ESPaDOnS.
+     * Not used for MegaCam. */
+    double temperature_effective = 8;
+
+    /* Whether the star is a "standard" star, to be observed each time other
+     * science targets are observed.
+     *
+     * Not used for MegaCam. */
+    bool standard_star = 9;
+
+    /* Contains identifiers discovered for this target. */
+    message LinkedTargetIdentifiers {
+
+        /* When entering targets through the web UI, PIs have the choice to
+         * either link a target to a catalog or explicitly not link a target.
+         *
+         * When entering data through the API, PIs do not have to make this
+         * choice, in which case this will be unset.
+         *
+         * It is recommended to provide the primary identifier returned by
+         * CDS/SIMBAD to help improve the quality of data reductions. */
+        oneof pi_verified {
+            /* Ids confirmed by the PI through the K2 web UI, or other
+             * confirmation step.
+             *
+             * When absent, the PI never confirmed a linking for this target. */
+            TargetIdentifiers pi_confirmed_identifiers = 1;
+
+            /* Used to indicate this is a target without known identifiers. */
+            bool custom_target = 2;
+        }
+    }
+
+    /* Identifiers linked to this target. */
+    LinkedTargetIdentifiers linked_target_identifiers = 10;
+
+    /* A read-only view of the finding charts for this target.
+     * To create or update finding charts, see the FindingChartService.
+     *
+     * storage: transient
+     * api_visibility: read only */
+    repeated FindingChartData finding_chart = 11 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+
+    /* The token of a pointing offset which should be used when observing
+     * this target.
+     *
+     * To view or manage pointing offsets, see the PointingOffsetService. */
+    string pointing_offset_token = 12;
+
+    /* A read-only view of the pointing offset which has been specified by
+     * pointing_offset_token.
+     *
+     * To view or manage pointing offsets, see the PointingOffsetService.
+     *
+     * storage: transient
+     * api_visibility: read only */
+    cfhtapi.observing.persistence.PointingOffset pointing_offset = 13 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+}
