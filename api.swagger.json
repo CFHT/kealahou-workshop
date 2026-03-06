@@ -1,0 +1,4997 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Kealahou API",
+    "version": "1.0",
+    "contact": {
+      "name": "CFHT Queued Service Observing Team",
+      "url": "https://hou-stage.cfht.hawaii.edu"
+    }
+  },
+  "tags": [
+    {
+      "name": "ProgramService"
+    },
+    {
+      "name": "TargetService"
+    }
+  ],
+  "host": "api-stage.cfht.hawaii.edu",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/pointing_offset": {
+      "get": {
+        "operationId": "PointingOffsetService_ListPointingOffset",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingPointingOffsetListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier your science program.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "instrument",
+            "description": "Available values : UNKNOWN, CFH12K, MEGACAM, WIRCAM, ESPADONS, SITELLE, SPIROU.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNKNOWN",
+              "CFH12K",
+              "MEGACAM",
+              "WIRCAM",
+              "ESPADONS",
+              "SITELLE",
+              "SPIROU",
+              "WENAOKEAO"
+            ],
+            "default": "UNKNOWN"
+          }
+        ],
+        "tags": [
+          "PointingOffsetService"
+        ]
+      }
+    },
+    "/programs": {
+      "get": {
+        "summary": "Programs will be scoped to the session *",
+        "operationId": "ProgramService_ListPrograms",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingListProgramsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "ProgramService"
+        ]
+      }
+    },
+    "/programs/{runid}/targets": {
+      "get": {
+        "summary": "Lists all targets for the specified program.",
+        "description": "Returns a list of targets.",
+        "operationId": "TargetService_ListTarget",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingTargetListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier the science program.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "targetType",
+            "description": "Filter the returned targets to only include the type specified.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ALL",
+              "FIXED",
+              "MOVING"
+            ],
+            "default": "ALL"
+          }
+        ],
+        "tags": [
+          "TargetService"
+        ]
+      }
+    },
+    "/programs/{runid}/targets/{token}": {
+      "get": {
+        "summary": "Show details of the specified target.",
+        "description": "Returns details on given target.",
+        "operationId": "TargetService_ShowTarget",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingTargetShowResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier your science program.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "description": "Unique identifier of the target.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes the specified target.",
+        "description": "Deletes the given target.",
+        "operationId": "TargetService_DeleteTarget",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingTargetDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier your science program.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "description": "Unique identifier of the target.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TargetService"
+        ]
+      },
+      "put": {
+        "summary": "Create or update the specified target.",
+        "description": "Creates or updates a target.",
+        "operationId": "TargetService_CreateOrUpdateTarget",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingTargetUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier for your science program.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "description": "Unique identifier of the target. If a target with this token already\nexists, it will be updated, otherwise it will be created.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "entity": {
+                  "$ref": "#/definitions/persistenceTargetData",
+                  "description": "Target data to be created or updated."
+                },
+                "lockVersion": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "If specified, the endpoint will use optimistic locking instead of last\nwrite wins. This should be set to the current version on entity."
+                },
+                "instrument": {
+                  "$ref": "#/definitions/typesInstrumentType",
+                  "title": "If specified, instrument-specific validation checks will be performed"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "TargetService"
+        ]
+      }
+    },
+    "/programs/{runid}/targets/{token}/ephemerides": {
+      "put": {
+        "summary": "Updates the ephemerides for the specified target.",
+        "description": "Updates the given target's ephemerides.",
+        "operationId": "TargetService_UpdateEphemerides",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/observingEphemeridesUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "runid",
+            "description": "Unique identifier your science program.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "token",
+            "description": "Unique identifier of the target.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ephemeris": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/persistenceTargetDataMovingTargetEphemeris"
+                  },
+                  "description": "List of ephemerides to set on the target."
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "TargetService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AllocationDataAgency": {
+      "type": "object",
+      "properties": {
+        "letter": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CalibrationCalibrationMode": {
+      "type": "string",
+      "enum": [
+        "no_calibration_mode",
+        "laser",
+        "phase"
+      ],
+      "default": "no_calibration_mode"
+    },
+    "CalibrationCalibrationPosition": {
+      "type": "string",
+      "enum": [
+        "no_calibration_position",
+        "zenith",
+        "target"
+      ],
+      "default": "no_calibration_position"
+    },
+    "ConfigDithering": {
+      "type": "object",
+      "properties": {
+        "isStaring": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ConfigNodding": {
+      "type": "object",
+      "properties": {
+        "startSequence": {
+          "$ref": "#/definitions/typesExposureType"
+        },
+        "targetDb": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ConfigurationMonitor": {
+      "type": "object",
+      "properties": {
+        "numberOfIterations": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minimumNumberOfIterations": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "waitBetweenObservationsMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "waitTolerance": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ConfigurationStandard": {
+      "type": "object",
+      "properties": {
+        "empty": {
+          "type": "string"
+        }
+      }
+    },
+    "EspadonsStatusGuiderSeeingProcessingResult": {
+      "type": "object",
+      "properties": {
+        "guiderSeeing": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "EspadonsStatusUpenaProcessingResult": {
+      "type": "object",
+      "properties": {
+        "iq": {
+          "type": "number",
+          "format": "double"
+        },
+        "h2oColumnDensityFromTelluricLines": {
+          "type": "number",
+          "format": "double"
+        },
+        "radialVelocityCorrections": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerCcdBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerSpecBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualWavelength": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerCcdBinPolar": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerSpecBinPolar": {
+          "type": "number",
+          "format": "double"
+        },
+        "h2oMmData": {
+          "$ref": "#/definitions/UpenaProcessingResulth2o_mm"
+        }
+      }
+    },
+    "ExposureDataAttribution": {
+      "type": "object",
+      "properties": {
+        "runid": {
+          "type": "string"
+        },
+        "observing_block_label": {
+          "type": "string",
+          "title": "If displaying the observing block to the user, this uniquely identifies it in the context\nof an observing group, i.e. OG3-2"
+        },
+        "observing_block_label_int": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Label of the observing block"
+        },
+        "observingBlockToken": {
+          "type": "string",
+          "description": "Token of the observing block this exposure is attributed to."
+        },
+        "observingGroupLabel": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Label of the observing group this exposure is attributed to."
+        },
+        "observingGroupToken": {
+          "type": "string",
+          "description": "Token of the observing group this exposure is attributed to."
+        },
+        "observingComponentToken": {
+          "type": "string",
+          "description": "Token of the observing component this exposure is attributed to."
+        },
+        "exposureNumber": {
+          "type": "integer",
+          "format": "int32",
+          "description": "exposure number this exposure is attributed to."
+        },
+        "instrument_run": {
+          "type": "string",
+          "title": "the queue run this exposure was taken under"
+        },
+        "attributingAgency": {
+          "type": "string",
+          "title": "the agency id"
+        },
+        "tacRank": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tacGrade": {
+          "type": "string"
+        }
+      }
+    },
+    "ExposureDataEspadonsStatus": {
+      "type": "object",
+      "properties": {
+        "instrMode": {
+          "type": "string"
+        },
+        "actualWavelength": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrExpMeter": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrWaveMeasInt": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrWaveMeasPol": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrMeasIntPerCcdBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrMeasIntPerSpecBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrMeasPolarCcdBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrMeasPolarSpecBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "trgType": {
+          "type": "string"
+        },
+        "guiderSeeing": {
+          "type": "number",
+          "format": "double"
+        },
+        "guiderSeeingProcessingResults": {
+          "$ref": "#/definitions/EspadonsStatusGuiderSeeingProcessingResult"
+        },
+        "exposureMeterProcessingResults": {
+          "$ref": "#/definitions/ExposureDataEspadonsStatusExposureMeterProcessingResult"
+        },
+        "upenaProcessingResults": {
+          "$ref": "#/definitions/EspadonsStatusUpenaProcessingResult"
+        },
+        "observationType": {
+          "type": "string"
+        }
+      }
+    },
+    "ExposureDataEspadonsStatusExposureMeterProcessingResult": {
+      "type": "object",
+      "properties": {
+        "snr": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ExposureDataExposureStatus": {
+      "type": "object",
+      "properties": {
+        "megacamStatus": {
+          "$ref": "#/definitions/ExposureDataMegacamStatus"
+        },
+        "wircamStatus": {
+          "$ref": "#/definitions/ExposureDataWircamStatus"
+        },
+        "espadonsStatus": {
+          "$ref": "#/definitions/ExposureDataEspadonsStatus"
+        },
+        "sitelleStatus": {
+          "$ref": "#/definitions/ExposureDataSitelleStatus"
+        },
+        "spirouStatus": {
+          "$ref": "#/definitions/ExposureDataSpirouStatus"
+        },
+        "wenaStatus": {
+          "$ref": "#/definitions/ExposureDataWenaStatus"
+        },
+        "exposureTime": {
+          "$ref": "#/definitions/persistenceExposureTime"
+        },
+        "expDateMjd": {
+          "type": "number",
+          "format": "double"
+        },
+        "queueName": {
+          "type": "string"
+        },
+        "expType": {
+          "type": "string"
+        },
+        "expStatus": {
+          "$ref": "#/definitions/persistenceState"
+        },
+        "isPhotometric": {
+          "type": "boolean"
+        },
+        "obsComment": {
+          "type": "string"
+        },
+        "seqComment": {
+          "type": "string"
+        },
+        "actualPointing": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "description": "TODO: come up with word which means it was read from instruments, measured, observed, reported, etc."
+        },
+        "actualSky": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualAirmass": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualMoondist": {
+          "type": "number",
+          "format": "double"
+        },
+        "observerComment": {
+          "type": "string"
+        },
+        "qcComment": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/definitions/ExposureStatusFile",
+          "description": "To read a file, simply absolute_path + base_name + ext."
+        },
+        "creditedQcoordinator": {
+          "type": "string"
+        },
+        "creditedObserver": {
+          "type": "string"
+        },
+        "grade": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "readObsDateUtc": {
+          "type": "string"
+        },
+        "readObsDateHst": {
+          "type": "string"
+        },
+        "readActualSkyName": {
+          "type": "string"
+        },
+        "ra": {
+          "type": "string",
+          "title": "Values from headers"
+        },
+        "dec": {
+          "type": "string"
+        },
+        "cmmtobs": {
+          "type": "string"
+        },
+        "cmmtseq": {
+          "type": "string"
+        },
+        "piName": {
+          "type": "string"
+        },
+        "nexp": {
+          "type": "string"
+        },
+        "cmpltexp": {
+          "type": "string"
+        },
+        "ha": {
+          "type": "string"
+        },
+        "readObsDateMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "object": {
+          "type": "string"
+        }
+      }
+    },
+    "ExposureDataMegacamStatus": {
+      "type": "object",
+      "properties": {
+        "iq": {
+          "type": "number",
+          "format": "double"
+        },
+        "skybg": {
+          "type": "number",
+          "format": "double"
+        },
+        "elixirEval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "elixirSeval": {
+          "type": "string"
+        },
+        "snr": {
+          "type": "number",
+          "format": "double"
+        },
+        "atmosphericTransmission": {
+          "type": "number",
+          "format": "double"
+        },
+        "elixirZeropoint": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualFilter": {
+          "type": "string"
+        },
+        "elixirProcessingResult": {
+          "$ref": "#/definitions/MegacamStatusElixirProcessingResult"
+        }
+      }
+    },
+    "ExposureDataSitelleStatus": {
+      "type": "object",
+      "properties": {
+        "cameraA": {
+          "$ref": "#/definitions/SitelleStatusCamera"
+        },
+        "cameraB": {
+          "$ref": "#/definitions/SitelleStatusCamera"
+        },
+        "relativeExtinction": {
+          "type": "number",
+          "format": "double"
+        },
+        "relativeExtinctionRms": {
+          "type": "number",
+          "format": "double"
+        },
+        "actualFilter": {
+          "type": "string"
+        }
+      }
+    },
+    "ExposureDataSpirouStatus": {
+      "type": "object",
+      "properties": {
+        "acqtime": {
+          "type": "number",
+          "format": "double"
+        },
+        "acqtime1": {
+          "type": "string"
+        },
+        "asicNum": {
+          "type": "string"
+        },
+        "scaId": {
+          "type": "string"
+        },
+        "muxtype": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "noutputs": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nadcs": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pddector": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "clkoff": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "warmtst": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "clocking": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "glbreset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "frmode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "camlink": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "expmode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nresets": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "frmtime": {
+          "type": "number",
+          "format": "double"
+        },
+        "exptime": {
+          "type": "number",
+          "format": "double"
+        },
+        "acqtype": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "datamode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "datlevel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "asicgain": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nomgain": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ampreset": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ktcremov": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "srccur": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ampinput": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "v4v3v2v1": {
+          "type": "string"
+        },
+        "units": {
+          "type": "string"
+        },
+        "tstation": {
+          "type": "string"
+        },
+        "hxrgver": {
+          "type": "string"
+        },
+        "mclk": {
+          "type": "number",
+          "format": "double"
+        },
+        "inttime": {
+          "type": "number",
+          "format": "double"
+        },
+        "frameno": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sbAdcS": {
+          "type": "string"
+        },
+        "sbadc1P": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbadc2P": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcaliP": {
+          "type": "string"
+        },
+        "sbdensP": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbrhb1P": {
+          "type": "string"
+        },
+        "sbrhb2P": {
+          "type": "string"
+        },
+        "sbetemP": {
+          "type": "string"
+        },
+        "sbInjT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbPolT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbCs1T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbCs2T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbCb1T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbCb2T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbiavl1s": {
+          "type": "string"
+        },
+        "sbiavl2s": {
+          "type": "string"
+        },
+        "sbetelS": {
+          "type": "string"
+        },
+        "sbCscS": {
+          "type": "string"
+        },
+        "sbcrefP": {
+          "type": "string"
+        },
+        "sbccasP": {
+          "type": "string"
+        },
+        "sbcdenP": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbagitS": {
+          "type": "string"
+        },
+        "sbcmirP": {
+          "type": "string"
+        },
+        "sbclhc1s": {
+          "type": "string"
+        },
+        "sbclhc1w": {
+          "type": "string"
+        },
+        "sbclhc1c": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbclhc2s": {
+          "type": "string"
+        },
+        "sbclhc2w": {
+          "type": "string"
+        },
+        "sbclhc2c": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbclwlS": {
+          "type": "string"
+        },
+        "sbclwlC": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbwlshS": {
+          "type": "string"
+        },
+        "sbctecS": {
+          "type": "string"
+        },
+        "sbctecct": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbctecht": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbccprit": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcccuT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbccprot": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcfbiT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcwlsT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbclsuat": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcfpiT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcfpeT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbcfpbP": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbvgaCp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbvgaIp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbvgbCp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbvgbIp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk00T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk01T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk02T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk03T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk04T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk05T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk06T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbmk07T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls000t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls001t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls002t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls003t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls004t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls005t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls006t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls007t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls008t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls009t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls010t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls011t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls100t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls101t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls102t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls103t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls104t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls105t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls106t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls107t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls108t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls109t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls110t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbls111t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl00iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl00hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl01iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl01hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl02iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl02hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl03iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl03hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl04iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl04hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl05iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl05hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl06iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl06hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl07iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl07hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl08iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl08hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl09iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl09hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl10iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl10hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl11iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl11hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl12iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl12hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl13iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sbl13hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "seadc1P": {
+          "type": "number",
+          "format": "double"
+        },
+        "seadc2P": {
+          "type": "number",
+          "format": "double"
+        },
+        "sedens_p": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sedens_p_float": {
+          "type": "number",
+          "format": "double"
+        },
+        "seInjT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sePolT": {
+          "type": "number",
+          "format": "double"
+        },
+        "seCs1T": {
+          "type": "number",
+          "format": "double"
+        },
+        "seCs2T": {
+          "type": "number",
+          "format": "double"
+        },
+        "seCb1T": {
+          "type": "number",
+          "format": "double"
+        },
+        "seCb2T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sectecct": {
+          "type": "number",
+          "format": "double"
+        },
+        "sectecht": {
+          "type": "number",
+          "format": "double"
+        },
+        "seccprit": {
+          "type": "number",
+          "format": "double"
+        },
+        "secccuT": {
+          "type": "number",
+          "format": "double"
+        },
+        "seccprot": {
+          "type": "number",
+          "format": "double"
+        },
+        "secfbiT": {
+          "type": "number",
+          "format": "double"
+        },
+        "secwlsT": {
+          "type": "number",
+          "format": "double"
+        },
+        "seclhc1c": {
+          "type": "number",
+          "format": "double"
+        },
+        "seclhc2c": {
+          "type": "number",
+          "format": "double"
+        },
+        "seclwlC": {
+          "type": "number",
+          "format": "double"
+        },
+        "seclsuat": {
+          "type": "number",
+          "format": "double"
+        },
+        "secfpiT": {
+          "type": "number",
+          "format": "double"
+        },
+        "secfpeT": {
+          "type": "number",
+          "format": "double"
+        },
+        "secfpbP": {
+          "type": "number",
+          "format": "double"
+        },
+        "sevgaCp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sevgaIp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sevgbCp": {
+          "type": "number",
+          "format": "double"
+        },
+        "sevgbIp": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk00T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk01T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk02T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk03T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk04T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk05T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk06T": {
+          "type": "number",
+          "format": "double"
+        },
+        "semk07T": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels000t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels001t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels002t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels003t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels004t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels005t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels006t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels007t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels008t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels009t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels010t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels011t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels100t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels101t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels102t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels103t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels104t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels105t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels106t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels107t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels108t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels109t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels110t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sels111t": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel00iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel00hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel01iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel01hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel02iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel02hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel03iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel03hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel04iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel04hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel05iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel05hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel06iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel06hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel07iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel07hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel08iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel08hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel09iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel09hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel10iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel10hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel11iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel11hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel12iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel12hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel13iT": {
+          "type": "number",
+          "format": "double"
+        },
+        "sel13hV": {
+          "type": "number",
+          "format": "double"
+        },
+        "guiderProcessing": {
+          "$ref": "#/definitions/SpirouStatusGuiderProcessingResult"
+        },
+        "exposureMeterProcessing": {
+          "$ref": "#/definitions/ExposureDataSpirouStatusExposureMeterProcessingResult"
+        },
+        "pipelineProcessing": {
+          "$ref": "#/definitions/SpirouStatusPipelineProcessingResult"
+        }
+      }
+    },
+    "ExposureDataSpirouStatusExposureMeterProcessingResult": {
+      "type": "object",
+      "properties": {
+        "flux": {
+          "type": "number",
+          "format": "double"
+        },
+        "snr": {
+          "type": "number",
+          "format": "double"
+        },
+        "midExposureDateMillis": {
+          "type": "number",
+          "format": "double"
+        },
+        "spemsnr": {
+          "type": "number",
+          "format": "double",
+          "title": "Calculated SNR"
+        },
+        "spemsnrc": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ExposureDataWenaStatus": {
+      "type": "object"
+    },
+    "ExposureDataWircamStatus": {
+      "type": "object",
+      "properties": {
+        "iqUncertainty": {
+          "type": "number",
+          "format": "double"
+        },
+        "absorption": {
+          "type": "number",
+          "format": "double"
+        },
+        "absorptionUncertainty": {
+          "type": "number",
+          "format": "double"
+        },
+        "numberOfStarsIq": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "numberOfStarsAbsorption": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "absoluteSkyLevel": {
+          "type": "number",
+          "format": "double"
+        },
+        "elongation": {
+          "type": "number",
+          "format": "double"
+        },
+        "mdcoords": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mdrepeat": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "actualFilter": {
+          "type": "string"
+        },
+        "iq": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ExposureStatusFile": {
+      "type": "object",
+      "properties": {
+        "absolutePath": {
+          "type": "string",
+          "description": "Absolute path to directory file is homed in. Starts with / and ends with /."
+        },
+        "baseName": {
+          "type": "string",
+          "title": "Name of file without extension"
+        },
+        "ext": {
+          "type": "string",
+          "description": "Name of extenion including ."
+        }
+      }
+    },
+    "FindingChartDataApproval": {
+      "type": "object",
+      "properties": {
+        "approvedAtMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "approvedByUsertoken": {
+          "type": "string"
+        }
+      }
+    },
+    "InstrumentConfigurationDataEspadonsConfigurationData": {
+      "type": "object",
+      "properties": {
+        "observingMode": {
+          "$ref": "#/definitions/InstrumentConfigurationDataEspadonsConfigurationDataOObservingMode"
+        },
+        "readoutMode": {
+          "$ref": "#/definitions/RReadoutMode"
+        },
+        "stokesParameter": {
+          "$ref": "#/definitions/persistenceStokesParameter"
+        },
+        "numberOfSequences": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "numberOfExposures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "needs_snr": {
+          "type": "boolean"
+        },
+        "snrWave": {
+          "type": "number",
+          "format": "double"
+        },
+        "snr": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "InstrumentConfigurationDataEspadonsConfigurationDataOObservingMode": {
+      "type": "string",
+      "enum": [
+        "Polarimetry",
+        "Spectroscopy_star_only",
+        "Spectroscopy_star_sky"
+      ],
+      "default": "Polarimetry"
+    },
+    "InstrumentConfigurationDataMegacamConfigurationData": {
+      "type": "object",
+      "properties": {
+        "filter": {
+          "$ref": "#/definitions/InstrumentConfigurationDataMegacamConfigurationDataFilter"
+        },
+        "binning": {
+          "$ref": "#/definitions/InstrumentConfigurationDataMegacamConfigurationDataBinning"
+        },
+        "isDynamicExposureTime": {
+          "type": "boolean",
+          "title": "TODO: is this needed billy? Can we use presence of snr or not to decide?\nI THINK SO.  We have the capability to calculate SNR on every exposure, but we aren't necessarily doing SNR mode observations with everything"
+        },
+        "minimumExposures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minExptimeMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "maxExptimeMs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "magAB": {
+          "type": "number",
+          "format": "double",
+          "title": "TODO: interesting field here because associated with the target, but in the legacy mp snr mode, the mag is carried with the IC! so have to go back to this :("
+        },
+        "snrMode": {
+          "$ref": "#/definitions/MegacamConfigurationDataSnrMode"
+        },
+        "etcPhotometry": {
+          "$ref": "#/definitions/InstrumentConfigurationDataMegacamConfigurationDataPhotometry"
+        }
+      }
+    },
+    "InstrumentConfigurationDataMegacamConfigurationDataBinning": {
+      "type": "string",
+      "enum": [
+        "one_one",
+        "two_two",
+        "three_three",
+        "four_four"
+      ],
+      "default": "one_one"
+    },
+    "InstrumentConfigurationDataMegacamConfigurationDataFilter": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "u",
+        "g",
+        "i",
+        "r",
+        "z",
+        "gri",
+        "CaHK",
+        "Ha",
+        "HaOFF",
+        "OIII",
+        "OIIIOFF",
+        "uS",
+        "gS",
+        "rS",
+        "iS",
+        "zS",
+        "N393S",
+        "HaS",
+        "HaOFFS",
+        "TiOS",
+        "CNS",
+        "OIIIS",
+        "PHGS"
+      ],
+      "default": "Unknown"
+    },
+    "InstrumentConfigurationDataMegacamConfigurationDataPhotometry": {
+      "type": "object",
+      "properties": {
+        "aperture": {
+          "$ref": "#/definitions/PhotometryAperture"
+        },
+        "psf": {
+          "type": "boolean"
+        }
+      }
+    },
+    "InstrumentConfigurationDataSitelleConfigurationData": {
+      "type": "object",
+      "properties": {
+        "filter": {
+          "$ref": "#/definitions/InstrumentConfigurationDataSitelleConfigurationDataFilter"
+        },
+        "binning": {
+          "$ref": "#/definitions/InstrumentConfigurationDataSitelleConfigurationDataBinning"
+        },
+        "resolution": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "snrwavelength": {
+          "type": "number",
+          "format": "double",
+          "title": "This should be on target too , sitell, espedons, spirou"
+        },
+        "calibration": {
+          "$ref": "#/definitions/SitelleConfigurationDataCalibration"
+        },
+        "resolutionMode": {
+          "$ref": "#/definitions/SitelleConfigurationDataResolutionMode"
+        },
+        "needsPrecision": {
+          "type": "boolean"
+        },
+        "needsFluxCalibration": {
+          "type": "boolean"
+        },
+        "needsTargetCalibration": {
+          "type": "boolean"
+        }
+      }
+    },
+    "InstrumentConfigurationDataSitelleConfigurationDataBinning": {
+      "type": "string",
+      "enum": [
+        "one_one",
+        "two_two",
+        "three_three"
+      ],
+      "default": "one_one"
+    },
+    "InstrumentConfigurationDataSitelleConfigurationDataFilter": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "NONE",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "SN1",
+        "SN2",
+        "SN3",
+        "SN4",
+        "SN5",
+        "SN6"
+      ],
+      "default": "UNKNOWN"
+    },
+    "InstrumentConfigurationDataSpirouConfigurationData": {
+      "type": "object",
+      "properties": {
+        "templateName": {
+          "type": "string",
+          "title": "Deprecated fields"
+        },
+        "observingMode": {
+          "$ref": "#/definitions/InstrumentConfigurationDataSpirouConfigurationDataOObservingMode"
+        },
+        "stokesParameter": {
+          "$ref": "#/definitions/persistenceStokesParameter"
+        },
+        "mode": {
+          "$ref": "#/definitions/MMode"
+        },
+        "skyObservation": {
+          "$ref": "#/definitions/SpirouConfigurationDataSkyObservation"
+        },
+        "numberOfSequences": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Each sequence is 1 exposure for Star mode and 4 exposures for ObservingMode"
+        },
+        "useSnr": {
+          "type": "boolean",
+          "title": "when true - use SNR for stoping exposures"
+        },
+        "skyEtimeMillis": {
+          "type": "string",
+          "format": "int64",
+          "title": "Used to override the etime for the sky_observation"
+        }
+      }
+    },
+    "InstrumentConfigurationDataSpirouConfigurationDataOObservingMode": {
+      "type": "string",
+      "enum": [
+        "Polarimetry",
+        "Star"
+      ],
+      "default": "Polarimetry"
+    },
+    "InstrumentConfigurationDataTracking": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "SID",
+        "NONSID",
+        "SID_NOG",
+        "NONSID_G"
+      ],
+      "default": "Unknown"
+    },
+    "InstrumentConfigurationDataWenaConfigurationData": {
+      "type": "object"
+    },
+    "InstrumentConfigurationDataWircamConfigurationData": {
+      "type": "object",
+      "properties": {
+        "filter": {
+          "$ref": "#/definitions/InstrumentConfigurationDataWircamConfigurationDataFilter"
+        },
+        "isMicrodithering": {
+          "type": "boolean"
+        },
+        "exposuresPerDpPosition": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Must always be \u003e 0"
+        },
+        "accuratePointing": {
+          "type": "boolean"
+        },
+        "defocus": {
+          "type": "number",
+          "format": "double"
+        },
+        "isStaring": {
+          "type": "boolean"
+        }
+      }
+    },
+    "InstrumentConfigurationDataWircamConfigurationDataFilter": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "W",
+        "H",
+        "J",
+        "Ks",
+        "Y",
+        "H2",
+        "KCont",
+        "CH4On",
+        "CH4Off",
+        "LowOH1",
+        "LowOH2",
+        "BrG",
+        "CO",
+        "COnar"
+      ],
+      "default": "UNKNOWN"
+    },
+    "MMode": {
+      "type": "string",
+      "enum": [
+        "Dark",
+        "Fabry_Perot",
+        "Wave_Hc1",
+        "Wave_Hc2",
+        "FLAT"
+      ],
+      "default": "Dark"
+    },
+    "MegacamConfigurationDataSnrMode": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "STANDARD",
+        "CUMULATIVE",
+        "ZERO_POINT"
+      ],
+      "default": "NONE"
+    },
+    "MegacamStatusElixirProcessingResult": {
+      "type": "object",
+      "properties": {
+        "iq": {
+          "type": "number",
+          "format": "double"
+        },
+        "skyBackground": {
+          "type": "number",
+          "format": "double"
+        },
+        "snr": {
+          "type": "number",
+          "format": "double"
+        },
+        "zeropoint": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "ObservingBlockConditionRequisite": {
+      "type": "object",
+      "properties": {
+        "requisiteObservingBlockIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "This should match the position of the observing block in the repeated observing_block list."
+        },
+        "waitPeriodMinMillis": {
+          "type": "string",
+          "format": "int64",
+          "title": "Minimum Time to wait after the requisite_ob exposure has been taken"
+        },
+        "waitPeriodMillis": {
+          "type": "string",
+          "format": "int64",
+          "title": "Optimal time to wait for observation"
+        },
+        "waitPeriodMaxMillis": {
+          "type": "string",
+          "format": "int64",
+          "title": "Maximum Time to wait after the requisite_ob exposure has been taken"
+        },
+        "unbounded": {
+          "type": "boolean",
+          "title": "If true, then this observation can happen any time after the requisite"
+        },
+        "seperateCameraRun": {
+          "type": "boolean",
+          "title": "How important is this?"
+        },
+        "sameCameraRun": {
+          "type": "boolean",
+          "title": "If true, must be in the same camera run"
+        }
+      }
+    },
+    "ObservingBlockConditionWindow": {
+      "type": "object",
+      "properties": {
+        "observeAfter": {
+          "type": "string",
+          "format": "int64"
+        },
+        "observeBefore": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "ObservingBlockObservingComponent": {
+      "type": "object",
+      "properties": {
+        "targetToken": {
+          "type": "string",
+          "title": "For a rest API this should be a link to expose through HATEOS"
+        },
+        "targetLabel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "observingTemplateToken": {
+          "type": "string",
+          "title": "For a rest API expose this with HATEOS"
+        },
+        "observingTemplateLabel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "snrBlockToken": {
+          "type": "string",
+          "title": "Only used with MegaCam cumulative SNR observing templates"
+        }
+      }
+    },
+    "ObservingGroupDataDitherScheme": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "STANDARD",
+        "GROUP"
+      ],
+      "default": "NONE"
+    },
+    "ObservingGroupDataObservingGroupState": {
+      "type": "string",
+      "enum": [
+        "NOT_STARTED",
+        "OBSERVED",
+        "STARTED",
+        "VALIDATED"
+      ],
+      "default": "NOT_STARTED"
+    },
+    "OrderDetailPhotons": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "type": "number",
+          "format": "double"
+        },
+        "sky": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "OrderDetailSnrEstimate": {
+      "type": "object",
+      "properties": {
+        "snrPerBin": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerCcdPixelBin": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "OrderDetailSnrEstimates": {
+      "type": "object",
+      "properties": {
+        "snrWithoutReadout": {
+          "type": "number",
+          "format": "double"
+        },
+        "snrPerFrame": {
+          "$ref": "#/definitions/OrderDetailSnrEstimate"
+        },
+        "snrPolar": {
+          "$ref": "#/definitions/OrderDetailSnrEstimate"
+        }
+      }
+    },
+    "OrderDetailTransmission": {
+      "type": "object",
+      "properties": {
+        "atmospheric": {
+          "type": "number",
+          "format": "double"
+        },
+        "total": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "PhaseScheduleObservingGroupPhaseSchedule": {
+      "type": "object",
+      "properties": {
+        "earliestObserveDateMillis": {
+          "type": "string",
+          "format": "int64",
+          "title": "the earliest moment to observe"
+        },
+        "tolerance": {
+          "$ref": "#/definitions/typesDuration",
+          "title": "the tolerance on the start moment in milliseconds"
+        },
+        "period": {
+          "$ref": "#/definitions/typesDuration",
+          "title": "the period of the observation date"
+        },
+        "periodTolerance": {
+          "$ref": "#/definitions/typesDuration",
+          "title": "the tolerance on the period"
+        }
+      }
+    },
+    "PhotometryAperture": {
+      "type": "object",
+      "properties": {
+        "optimalAperture": {
+          "type": "boolean"
+        },
+        "fixedAperture": {
+          "type": "number",
+          "format": "double",
+          "title": "Radius of the aperture in arcsec"
+        },
+        "ninetySixPercentFluxAperture": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ProgramCollaboratorInfoCollaborator": {
+      "type": "object",
+      "properties": {
+        "userToken": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/ProgramCollaboratorInfoCollaboratorStatus"
+        },
+        "username": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      }
+    },
+    "ProgramCollaboratorInfoCollaboratorStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "ADDED"
+      ],
+      "default": "PENDING"
+    },
+    "ProgramCollaboratorInfoInvite": {
+      "type": "object",
+      "properties": {
+        "inviteToken": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/ProgramCollaboratorInfoInviteStatus"
+        }
+      }
+    },
+    "ProgramCollaboratorInfoInviteStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "SENT",
+        "DECLINED"
+      ],
+      "default": "PENDING"
+    },
+    "ProgramCollaboratorInfoProgramPermission": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "READ",
+        "WRITE",
+        "ADMIN",
+        "DATA_ACCESS",
+        "PI"
+      ],
+      "default": "UNKNOWN",
+      "description": "This ia a duplicate of cfht.authorization.data.Grant.Program.ProgramPermission.\nPart of a different domain so we can't share.\nThere has to be a better way than just duplicating this enum..."
+    },
+    "ProgramDataComments": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
+      }
+    },
+    "ProgramDataContactInfo": {
+      "type": "object",
+      "properties": {
+        "piFirstName": {
+          "type": "string"
+        },
+        "piLastName": {
+          "type": "string"
+        },
+        "piEmail": {
+          "type": "string"
+        },
+        "userToken": {
+          "type": "string"
+        }
+      }
+    },
+    "ProgramDataProgramType": {
+      "type": "string",
+      "enum": [
+        "REGULAR",
+        "TARGET_OF_OPPORTUNITY",
+        "CALIBRATION",
+        "SNAPSHOT"
+      ],
+      "default": "REGULAR"
+    },
+    "ProgramInfoPiInfo": {
+      "type": "object",
+      "properties": {
+        "ldapUsername": {
+          "type": "string"
+        },
+        "emailAddress": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "legacyUsername": {
+          "type": "string"
+        },
+        "userToken": {
+          "type": "string"
+        }
+      }
+    },
+    "RReadoutMode": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Slow",
+        "Fast"
+      ],
+      "default": "Normal"
+    },
+    "ReelConfiguration": {
+      "type": "object",
+      "properties": {
+        "standard": {
+          "$ref": "#/definitions/ConfigurationStandard"
+        },
+        "single": {
+          "type": "boolean"
+        },
+        "monitored": {
+          "$ref": "#/definitions/ConfigurationMonitor"
+        },
+        "custom": {
+          "type": "boolean",
+          "description": "When custom is true, the observing_block list is directly\nset by the end user."
+        },
+        "sampling": {
+          "$ref": "#/definitions/ReelConfigurationSampling"
+        }
+      }
+    },
+    "ReelConfigurationSampling": {
+      "type": "object",
+      "properties": {
+        "numberOfSamples": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minimumNumberOfSamples": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "description": "Used to sample a target at a given frequency.\n\nIt is a very simple pattern which means, observe every night if the target is visible."
+    },
+    "SitelleConfigurationDataCalibration": {
+      "type": "object",
+      "properties": {
+        "calibrationPosition": {
+          "$ref": "#/definitions/CalibrationCalibrationPosition"
+        },
+        "calibrationMode": {
+          "$ref": "#/definitions/CalibrationCalibrationMode"
+        }
+      }
+    },
+    "SitelleConfigurationDataResolutionMode": {
+      "type": "string",
+      "enum": [
+        "no_resolution_mode",
+        "hires",
+        "medres"
+      ],
+      "default": "no_resolution_mode"
+    },
+    "SitelleStatusCamera": {
+      "type": "object",
+      "properties": {
+        "iq": {
+          "type": "number",
+          "format": "double"
+        },
+        "iqRms": {
+          "type": "number",
+          "format": "double"
+        },
+        "pixelShiftX": {
+          "type": "number",
+          "format": "double"
+        },
+        "pixelShiftY": {
+          "type": "number",
+          "format": "double"
+        },
+        "numberOfStars": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "me": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "SnrBlockDataSnrBlockObservingComponents": {
+      "type": "object",
+      "properties": {
+        "observingComponentToken": {
+          "type": "string",
+          "title": "the observing component"
+        },
+        "observingGroupToken": {
+          "type": "string",
+          "title": "should not be here, should be in the parent"
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "title": "is it the original oc?"
+        },
+        "configuredExposures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "exposures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceExposureData"
+          }
+        },
+        "obLabel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "targetToken": {
+          "type": "string"
+        },
+        "observingTemplateToken": {
+          "type": "string"
+        }
+      },
+      "title": "a pointer to an observing component object\n and whether it is the primary/original"
+    },
+    "SpirouConfigurationDataSkyObservation": {
+      "type": "string",
+      "enum": [
+        "None",
+        "Before",
+        "After",
+        "BeforeAndAfter"
+      ],
+      "default": "None"
+    },
+    "SpirouStatusGuiderProcessingResult": {
+      "type": "object",
+      "properties": {
+        "etime": {
+          "type": "number",
+          "format": "double"
+        },
+        "isustate": {
+          "type": "string"
+        },
+        "sbdensP": {
+          "type": "number",
+          "format": "double"
+        },
+        "holePositionOffsetX": {
+          "type": "number",
+          "format": "double"
+        },
+        "holePositionOffsetY": {
+          "type": "number",
+          "format": "double"
+        },
+        "starToNullPositionOffsetX": {
+          "type": "number",
+          "format": "double"
+        },
+        "starToNullPositionOffsetY": {
+          "type": "number",
+          "format": "double"
+        },
+        "magnitudeEstimate": {
+          "type": "number",
+          "format": "double"
+        },
+        "seeingEstimate": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgisust": {
+          "type": "string",
+          "title": "per  160676372"
+        },
+        "sggdst": {
+          "type": "string"
+        },
+        "sgfrmrt": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgetime": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgnullx": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgnully": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgwinx0": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgwiny0": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgwinx1": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgwiny1": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgoffx0": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgoffy0": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgoffx1": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgoffy1": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgholex": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgholey": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcholex": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcholey": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgeholex": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgeholey": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcstarx": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcstary": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgestarx": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgestary": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcnoffx": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcnoffy": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcsee": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgesee": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgcmagn": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgemagn": {
+          "type": "number",
+          "format": "double"
+        },
+        "sgssee": {
+          "type": "number",
+          "format": "double"
+        },
+        "trgType": {
+          "type": "string"
+        }
+      },
+      "title": "from processing, the expected data in the log book are"
+    },
+    "SpirouStatusPipelineProcessingResult": {
+      "type": "object",
+      "properties": {
+        "snr10": {
+          "type": "number",
+          "format": "double"
+        },
+        "snr34": {
+          "type": "number",
+          "format": "double"
+        },
+        "snr44": {
+          "type": "number",
+          "format": "double"
+        },
+        "dprtype": {
+          "type": "string"
+        },
+        "ccfmask": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccfmacpp": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccfrv": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccfcontr": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccfrvc": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccffwhm": {
+          "type": "number",
+          "format": "double"
+        },
+        "ccfmaskStr": {
+          "type": "string"
+        }
+      }
+    },
+    "TargetDataFixedTargetProperMotion": {
+      "type": "object",
+      "properties": {
+        "raMas": {
+          "type": "number",
+          "format": "double",
+          "description": "Motion in the right ascension axis in milliarcseconds/year."
+        },
+        "decMas": {
+          "type": "number",
+          "format": "double",
+          "description": "Motion in the declination axis in milliarcseconds/year."
+        }
+      },
+      "description": "The rate of change in angular coordinates for the target."
+    },
+    "TargetDataOldMagnitudeOld": {
+      "type": "object",
+      "properties": {
+        "magnitudeType": {
+          "type": "string"
+        },
+        "magnitude": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "TargetDataOldMagnitudesOld": {
+      "type": "object",
+      "properties": {
+        "U": {
+          "type": "number",
+          "format": "double"
+        },
+        "B": {
+          "type": "number",
+          "format": "double"
+        },
+        "V": {
+          "type": "number",
+          "format": "double"
+        },
+        "R": {
+          "type": "number",
+          "format": "double"
+        },
+        "I": {
+          "type": "number",
+          "format": "double"
+        },
+        "G": {
+          "type": "number",
+          "format": "double"
+        },
+        "J": {
+          "type": "number",
+          "format": "double"
+        },
+        "H": {
+          "type": "number",
+          "format": "double"
+        },
+        "K": {
+          "type": "number",
+          "format": "double"
+        },
+        "uu": {
+          "type": "number",
+          "format": "double"
+        },
+        "gg": {
+          "type": "number",
+          "format": "double"
+        },
+        "rr": {
+          "type": "number",
+          "format": "double"
+        },
+        "ii": {
+          "type": "number",
+          "format": "double"
+        },
+        "zz": {
+          "type": "number",
+          "format": "double"
+        },
+        "AB": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "TargetDataOldRadialVelocityDeprecated": {
+      "type": "object",
+      "properties": {
+        "meanKmS": {
+          "type": "number",
+          "format": "double"
+        },
+        "requested_accuracy_km": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "TargetListRequestTargetType": {
+      "type": "string",
+      "enum": [
+        "ALL",
+        "FIXED",
+        "MOVING"
+      ],
+      "default": "ALL"
+    },
+    "TargetTimeDataView": {
+      "type": "string",
+      "enum": [
+        "REQUESTED",
+        "ACTUAL"
+      ],
+      "default": "REQUESTED",
+      "description": "Indicates which ITime the callers should prefer when reporting a singular ITime.\n\n - REQUESTED: Prefer the requested_integration_time when reporting a singular ITime.\n - ACTUAL: Prefer the actual_integration_time when reporting a singular ITime."
+    },
+    "TelescopePatternConfig": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "chargeModel": {
+          "type": "string",
+          "title": "Used for calculating cost for this pattern"
+        },
+        "dithering": {
+          "$ref": "#/definitions/ConfigDithering"
+        },
+        "nodding": {
+          "$ref": "#/definitions/ConfigNodding"
+        },
+        "scale": {
+          "type": "number",
+          "format": "double"
+        },
+        "sybasePatId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "isSystem": {
+          "type": "boolean"
+        }
+      }
+    },
+    "TelescopePatternOffset": {
+      "type": "object",
+      "properties": {
+        "exposureNumber": {
+          "type": "integer",
+          "format": "int32",
+          "description": "TODO: deprecate, no need to have duplicate information here."
+        },
+        "offset": {
+          "$ref": "#/definitions/typesOffsetCoordinate"
+        },
+        "type": {
+          "$ref": "#/definitions/typesExposureType",
+          "title": "For dithering patterns type is always target"
+        }
+      }
+    },
+    "TimeAccountingDataTimeAccountingStatus": {
+      "type": "string",
+      "enum": [
+        "NOT_STARTED",
+        "STARTED",
+        "OBSERVED",
+        "VALIDATED"
+      ],
+      "default": "NOT_STARTED",
+      "description": "Lifecycle states time accounting entities transition through.\n\n - NOT_STARTED: No exposures configured by the entity have been observed.\n - STARTED: A subset of exposures configured by the entity have been observed.\n\nAn `ExposureEntity` will never be in this state. Technically an `ExposureEntity`\nis started after `sgo` has been sent, but before the exposure is complete.\nHowever, we currently don't create `ExposureEntity`s in Kealahou until after observation.\n - OBSERVED: All exposures configured by the entity have been observed, but at least one is not validated.\n - VALIDATED: All exposures configured by the entity have been validated."
+    },
+    "UpenaProcessingResulth2o_mm": {
+      "type": "object",
+      "properties": {
+        "rawDensity": {
+          "type": "number",
+          "format": "double"
+        },
+        "atZenith": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "httpErrors": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "observingEphemeridesUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        },
+        "entity": {
+          "$ref": "#/definitions/persistenceTargetData"
+        }
+      }
+    },
+    "observingEspadonsEtcMoonPhase": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_MOON_PHASE",
+        "NEW",
+        "CRESCENT",
+        "QUARTER",
+        "GIBBOUS",
+        "FULL"
+      ],
+      "default": "UNKNOWN_MOON_PHASE"
+    },
+    "observingEspadonsEtcObservingMode": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_OBSERVING_MODE",
+        "POLARIMETRY",
+        "SPECTROSCOPY_STAR_ONLY",
+        "SPECTROSCOPY_STAR_SKY"
+      ],
+      "default": "UNKNOWN_OBSERVING_MODE"
+    },
+    "observingEspadonsEtcReadoutMode": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_READOUT_MODE",
+        "NORMAL",
+        "SLOW",
+        "FAST"
+      ],
+      "default": "UNKNOWN_READOUT_MODE"
+    },
+    "observingEspadonsWavelength": {
+      "type": "string",
+      "enum": [
+        "ZERO",
+        "THREE_HUNDRED_SEVENTY_TWO",
+        "THREE_HUNDRED_SEVENTY_SEVEN",
+        "THREE_HUNDRED_EIGHTY_FOUR",
+        "THREE_HUNDRED_NINETY",
+        "THREE_HUNDRED_NINETY_SEVEN",
+        "FOUR_HUNDRED_FOUR",
+        "FOUR_HUNDRED_TWELVE",
+        "FOUR_HUNDRED_NINETEEN",
+        "FOUR_HUNDRED_TWENTY_SEVEN",
+        "FOUR_HUNDRED_THIRTY_FIVE",
+        "FOUR_HUNDRED_FORTY_FOUR",
+        "FOUR_HUNDRED_FIFTY_THREE",
+        "FOUR_HUNDRED_SIXTY_TWO",
+        "FOUR_HUNDRED_SEVENTY_TWO",
+        "FOUR_HUNDRED_EIGHTY_TWO",
+        "FOUR_HUNDRED_NINETY_TWO",
+        "FIVE_HUNDRED_THREE",
+        "FIVE_HUNDRED_FIFTEEN",
+        "FIVE_HUNDRED_TWENTY_SEVEN",
+        "FIVE_HUNDRED_THIRTY_NINE",
+        "FIVE_HUNDRED_FIFTY_TWO",
+        "FIVE_HUNDRED_SIXTY_SIX",
+        "FIVE_HUNDRED_EIGHTY_ONE",
+        "FIVE_HUNDRED_NINETY_SIX",
+        "SIX_HUNDRED_TWELVE",
+        "SIX_HUNDRED_TWENTY_NINE",
+        "SIX_HUNDRED_FORTY_SEVEN",
+        "SIX_HUNDRED_SIXTY_SIX",
+        "SIX_HUNDRED_EIGHTY_SIX",
+        "SEVEN_HUNDRED_EIGHT",
+        "SEVEN_HUNDRED_THIRTY",
+        "SEVEN_HUNDRED_FIFTY_FIVE",
+        "SEVEN_HUNDRED_EIGHTY_ONE",
+        "EIGHT_HUNDRED_NINE",
+        "EIGHT_HUNDRED_THIRTY_NINE",
+        "EIGHT_HUNDRED_SEVENTY_ONE",
+        "NINE_HUNDRED_SIX",
+        "NINE_HUNDRED_FORTY_THREE",
+        "NINE_HUNDRED_EIGHTY_FIVE",
+        "ONE_THOUSAND_TWENTY_NINE"
+      ],
+      "default": "ZERO"
+    },
+    "observingListProgramsResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "entity": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/observingProgramInfo"
+          }
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        }
+      }
+    },
+    "observingMegacamDepthType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_DEPTH_TYPE",
+        "MAG_AB",
+        "FLUX"
+      ],
+      "default": "UNKNOWN_DEPTH_TYPE"
+    },
+    "observingMegacamSourceType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_SOURCE_TYPE",
+        "POINT_SOURCE",
+        "GALAXY",
+        "EXTENDED_SOURCE"
+      ],
+      "default": "UNKNOWN_SOURCE_TYPE"
+    },
+    "observingPointingOffsetListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "entity": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/observingpersistencePointingOffset"
+          }
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        }
+      }
+    },
+    "observingProgramInfo": {
+      "type": "object",
+      "properties": {
+        "programData": {
+          "$ref": "#/definitions/persistenceProgramData"
+        },
+        "rollupFields": {
+          "$ref": "#/definitions/observingRollupFields"
+        },
+        "timeAccounting": {
+          "$ref": "#/definitions/persistenceTimeAccountingData"
+        },
+        "piInfo": {
+          "$ref": "#/definitions/ProgramInfoPiInfo"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "observingRollupFields": {
+      "type": "object",
+      "properties": {
+        "iTime": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "iTimeConfigured": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "subTotals": {
+          "$ref": "#/definitions/persistenceSubTotalsData"
+        }
+      }
+    },
+    "observingTargetDeleteResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        }
+      }
+    },
+    "observingTargetListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "entity": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceTargetData"
+          }
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        }
+      }
+    },
+    "observingTargetShowResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        },
+        "entity": {
+          "$ref": "#/definitions/persistenceTargetData"
+        }
+      }
+    },
+    "observingTargetUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "error": {
+          "$ref": "#/definitions/httpErrors"
+        },
+        "entity": {
+          "$ref": "#/definitions/persistenceTargetData"
+        }
+      }
+    },
+    "observingpersistencePointingOffset": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "offset": {
+          "$ref": "#/definitions/typesOffsetCoordinate"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userToken": {
+          "type": "string",
+          "title": "this is the PI of the program that this entity will be recorded for\nif null should be derived using the program_data.contact_info.user_token\nif null, then a system ?? gross"
+        },
+        "instrument": {
+          "$ref": "#/definitions/typesInstrumentType",
+          "title": "the instrument for the pointing"
+        },
+        "isSystem": {
+          "type": "boolean"
+        }
+      }
+    },
+    "observingpersistenceTimeConstraint": {
+      "type": "object",
+      "properties": {
+        "window": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObservingBlockConditionWindow"
+          }
+        }
+      }
+    },
+    "persistenceAllocationData": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string"
+        },
+        "timeAllocatedMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "tacRank": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tacGrade": {
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/definitions/typesInstrumentType"
+        },
+        "agency": {
+          "$ref": "#/definitions/AllocationDataAgency"
+        },
+        "cfhtRank": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "persistenceCatalogIdentifier": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "type": "string",
+          "description": "Catalog to reference."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "Valid identifier in the catalog.\n\nNote: this ID will contain a catalog name, because spacing matters in catalogs, the full ID for an object is like\nM    4. Catalog is M, id is identifier could be 4, but to reference m4, you need the spaces.\n\nNB: These identity values can not be set in fits headers because they do not have to conform to\nthe length restrictions."
+        }
+      },
+      "description": "Ties to some external system.\n\nA string representation can take the form of \u003ccatalog\u003e:\u003cidentifier\u003e"
+    },
+    "persistenceConstraint": {
+      "type": "object",
+      "properties": {
+        "imageQuality": {
+          "$ref": "#/definitions/typesDoubleMinMax"
+        },
+        "skyBackgroundMax": {
+          "type": "number",
+          "format": "double"
+        },
+        "airmassMax": {
+          "type": "number",
+          "format": "double"
+        },
+        "extinctionMax": {
+          "type": "number",
+          "format": "double"
+        },
+        "moonDistanceArcLengthMin": {
+          "type": "number",
+          "format": "double"
+        },
+        "photometric": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sybaseConsId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "h2oVaporMax": {
+          "type": "number",
+          "format": "double"
+        },
+        "readSkyBackgroundName": {
+          "type": "string"
+        },
+        "skyBackgroundName": {
+          "type": "string"
+        }
+      },
+      "title": "Part of observing_template_data - not stored on any table individually"
+    },
+    "persistenceExposureData": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "obsid": {
+          "type": "string"
+        },
+        "exposureNumber": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "iteration": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "parentExposureToken": {
+          "type": "string"
+        },
+        "exposureStatus": {
+          "$ref": "#/definitions/ExposureDataExposureStatus"
+        },
+        "observingTemplate": {
+          "$ref": "#/definitions/persistenceObservingTemplateData"
+        },
+        "target": {
+          "$ref": "#/definitions/persistenceTargetDataOld",
+          "title": "TODO: swap with the commented line below once no longer needed"
+        },
+        "target_data": {
+          "$ref": "#/definitions/persistenceTargetData",
+          "title": "reserved 8;"
+        },
+        "observingGroupContext": {
+          "$ref": "#/definitions/persistenceObservingGroupContext",
+          "description": "Contains live data for the overall state of the observing group."
+        },
+        "allDerivationsComplete": {
+          "type": "boolean",
+          "description": "When false, there is data which is still being calculated for this exposure.\n\nData can still be displayed, but the client should attempt to refresh the data."
+        },
+        "queueRunId": {
+          "type": "string"
+        },
+        "cameraRunId": {
+          "type": "string"
+        },
+        "prgRunId": {
+          "type": "string"
+        },
+        "observingComponentToken": {
+          "type": "string"
+        },
+        "subTotals": {
+          "$ref": "#/definitions/persistenceSubTotalsData"
+        },
+        "attribution": {
+          "$ref": "#/definitions/ExposureDataAttribution",
+          "description": "As soon as an exposure is marked observed, this attribution is available",
+          "title": "Allows exposures to be moved to different observing blocks"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "storage: transient\napi_visibility: read only, incremented by the server",
+          "title": "Increments when this object updates"
+        }
+      }
+    },
+    "persistenceExposureTime": {
+      "type": "object",
+      "properties": {
+        "desiredSnr": {
+          "type": "number",
+          "format": "double"
+        },
+        "exposureTimeMs": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "persistenceFindingChartData": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "staffApproval": {
+          "$ref": "#/definitions/FindingChartDataApproval"
+        },
+        "piApproval": {
+          "$ref": "#/definitions/FindingChartDataApproval"
+        },
+        "targetToken": {
+          "type": "string"
+        }
+      }
+    },
+    "persistenceITimeData": {
+      "type": "object",
+      "properties": {
+        "exposureTimeMillis": {
+          "type": "string",
+          "format": "int64",
+          "description": "Time spent collecting photons (in milliseconds).",
+          "readOnly": true
+        },
+        "overheadTimeMillis": {
+          "type": "string",
+          "format": "int64",
+          "description": "All other times required for taking the exposure (in milliseconds).",
+          "readOnly": true
+        }
+      },
+      "description": "Total combined time for exposure time and overheads (in milliseconds).",
+      "title": "Integration Time",
+      "readOnly": true
+    },
+    "persistenceInstrumentConfigurationData": {
+      "type": "object",
+      "properties": {
+        "espadonsConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataEspadonsConfigurationData"
+        },
+        "megacamConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataMegacamConfigurationData"
+        },
+        "wircamConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataWircamConfigurationData"
+        },
+        "sitelleConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataSitelleConfigurationData"
+        },
+        "spirouConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataSpirouConfigurationData"
+        },
+        "wenaConfiguration": {
+          "$ref": "#/definitions/InstrumentConfigurationDataWenaConfigurationData"
+        },
+        "sybaseIcId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "etimeOrSnr": {
+          "$ref": "#/definitions/persistenceExposureTime"
+        },
+        "sybaseConsId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "tracking": {
+          "$ref": "#/definitions/InstrumentConfigurationDataTracking"
+        }
+      },
+      "title": "Part of observing_template_data - not stored on any table individually"
+    },
+    "persistenceLegacyReel": {
+      "type": "object",
+      "properties": {
+        "reelOgToken": {
+          "type": "string"
+        },
+        "delay": {
+          "$ref": "#/definitions/typesDuration"
+        },
+        "window": {
+          "$ref": "#/definitions/typesDuration"
+        },
+        "reelOgLabel": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "persistenceListOfIdentifiers": {
+      "type": "object",
+      "properties": {
+        "catalogIdentifier": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceCatalogIdentifier"
+          }
+        }
+      }
+    },
+    "persistenceObservingBlockCondition": {
+      "type": "object",
+      "properties": {
+        "pre_requisite": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObservingBlockConditionRequisite"
+          }
+        },
+        "window": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObservingBlockConditionWindow"
+          },
+          "description": "Windows can not overlap, and will always be stored in order from now to future.",
+          "title": "This window is just scheduling constraints for when you want observations to be made,\nWhen calculating expires_at for this OB, the window will be used masked by the target visibility\nwhich is calculated from airmass \u0026 RA/DEC"
+        }
+      }
+    },
+    "persistenceObservingGroupContext": {
+      "type": "object",
+      "properties": {
+        "iterationCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The iteration number this object was part of in the observing group"
+        },
+        "iterationTotal": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The total number of iterations requested for the observing group"
+        },
+        "iterationMinimum": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Minimum number of iterations this OG needs to provide science value"
+        },
+        "subtotalsData": {
+          "$ref": "#/definitions/persistenceSubTotalsData",
+          "description": "The observing group subtotals.\nDeprecated, use time_accounting."
+        },
+        "window": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObservingBlockConditionWindow"
+          },
+          "title": "Sorted by from past -\u003e future on the observe_after key"
+        },
+        "observingGroupToken": {
+          "type": "string"
+        },
+        "observingGroupPriority": {
+          "$ref": "#/definitions/persistenceObservingGroupPriority"
+        },
+        "observingGroupState": {
+          "$ref": "#/definitions/ObservingGroupDataObservingGroupState"
+        },
+        "observingGroupLabel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "observingGroupVersion": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Increments every time the observing group changes."
+        },
+        "legacyReel": {
+          "$ref": "#/definitions/persistenceLegacyReel"
+        },
+        "single": {
+          "type": "boolean"
+        },
+        "targetMonitoring": {
+          "$ref": "#/definitions/persistenceTargetMonitoringObservingGroupTimeConstraint"
+        },
+        "phaseSchedule": {
+          "$ref": "#/definitions/PhaseScheduleObservingGroupPhaseSchedule"
+        },
+        "timeAccounting": {
+          "$ref": "#/definitions/persistenceTimeAccountingData",
+          "description": "*\nTimeAccounting for the observing group.\n\napi_visibility: readonly"
+        },
+        "exposureType": {
+          "$ref": "#/definitions/typesExposureType"
+        },
+        "useGroupDitherScheme": {
+          "type": "boolean"
+        }
+      }
+    },
+    "persistenceObservingGroupData": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "Next ID 30"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ogPriority": {
+          "$ref": "#/definitions/persistenceObservingGroupPriority"
+        },
+        "singleObservingGroup": {
+          "$ref": "#/definitions/persistenceSingleObservingGroup"
+        },
+        "samplingObservingGroup": {
+          "$ref": "#/definitions/persistenceSamplingObservingGroup"
+        },
+        "periodic_observing_group": {
+          "$ref": "#/definitions/persistenceTargetMonitoringObservingGroup"
+        },
+        "transientObservingGroup": {
+          "$ref": "#/definitions/persistenceTransientObservingGroup"
+        },
+        "phaseScheduleObservingGroup": {
+          "$ref": "#/definitions/persistencePhaseScheduleObservingGroup"
+        },
+        "read_observing_block": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+          },
+          "title": "api_visibility: read only"
+        },
+        "observingBlockCondition": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/persistenceObservingBlockCondition"
+          },
+          "title": "api_visibility: read only"
+        },
+        "minimumObservingBlockCount": {
+          "type": "integer",
+          "format": "int32",
+          "title": "api_visibility: read only"
+        },
+        "subTotals": {
+          "$ref": "#/definitions/persistenceSubTotalsData",
+          "title": "Deprecated, use time_accounting.\napi_visibility: operations read only"
+        },
+        "timeAccounting": {
+          "$ref": "#/definitions/persistenceTimeAccountingData",
+          "description": "TimeAccounting for the observing group.\n\napi_visibility: readonly"
+        },
+        "reel": {
+          "$ref": "#/definitions/persistenceReel"
+        },
+        "sybaseOgId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "state": {
+          "$ref": "#/definitions/ObservingGroupDataObservingGroupState"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "storage: transient\napi_visibility: read only, incremented by the server",
+          "title": "Increments when this object updates"
+        },
+        "legacyReel": {
+          "$ref": "#/definitions/persistenceLegacyReel"
+        },
+        "timeConstraint": {
+          "$ref": "#/definitions/observingpersistenceTimeConstraint"
+        },
+        "targetType": {
+          "$ref": "#/definitions/typesExposureType",
+          "title": "this is a data for espadons,\nin particular espadons calibration programs that use beyond the OBJECT exposure type"
+        },
+        "ditherScheme": {
+          "$ref": "#/definitions/ObservingGroupDataDitherScheme"
+        },
+        "lowSurfaceBrightness": {
+          "type": "boolean"
+        }
+      },
+      "description": "If we need to add an observing group reels\nThen the calculator won't have to change much.\nThe dependency calculator can throw a \"data not ready\"\nif it sees it has any requisite ogs which haven't had the\nschedule feature completed."
+    },
+    "persistenceObservingGroupDataObservingBlock": {
+      "type": "object",
+      "properties": {
+        "observingComponent": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObservingBlockObservingComponent"
+          }
+        },
+        "token": {
+          "type": "string",
+          "description": "We need the token so we don't have to needlesly destroy/create OBs when saving.\n\nAlso allows us to join the observing blocks in the right order when creating a full\nObservingGroup\n\napi_visibility: operations read only"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32",
+          "title": "api_visibility: read only"
+        }
+      }
+    },
+    "persistenceObservingGroupPriority": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN_OG_PRIORITY",
+        "HIGH",
+        "MEDIUM",
+        "LOW",
+        "INACTIVE"
+      ],
+      "default": "UNKNOWN_OG_PRIORITY",
+      "title": "- INACTIVE: Don't Observe"
+    },
+    "persistenceObservingTemplateData": {
+      "type": "object",
+      "properties": {
+        "instrumentConfiguration": {
+          "$ref": "#/definitions/persistenceInstrumentConfigurationData",
+          "title": "Next available ID 17"
+        },
+        "constraint": {
+          "$ref": "#/definitions/persistenceConstraint"
+        },
+        "telescope_offset": {
+          "$ref": "#/definitions/persistenceTelescopePattern"
+        },
+        "chargeModel": {
+          "type": "string",
+          "description": "Used for calculating cost for this pattern\nInvokes code which reads the ExposureInstructions and\nattributes a cost to it."
+        },
+        "itime": {
+          "type": "string",
+          "format": "int64"
+        },
+        "calculateEtime": {
+          "$ref": "#/definitions/persistenceExposureTime",
+          "title": "int calculated_etime = 6;  /* from the ETC, can be different than the input etime */"
+        },
+        "acquisitionTime": {
+          "$ref": "#/definitions/persistenceExposureTime",
+          "title": "SNR or E-Time per exposure  =\u003e therefore we do not need the ExposureTime message in each IC? question above as well"
+        },
+        "token": {
+          "type": "string"
+        },
+        "associatedObservingBlocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesBigInteger"
+          },
+          "description": "select ob.* from ob, prg, icseq where ob.prg_id = prg.id\nand prg.runid=\u003crunid\u003e\nand icseq.ob_id=ob.id and ob.con_id = \u003cconstraint.sybase_cons_id\u003e\nand icseq.ic_id = \u003cinstrument_configuration.sybase_ic_id\u003e;",
+          "title": "When just creating an OT, this list is empty\nWhen this OT belongs to an OG, then any OBs in sybase that this OT is related too must be filled in.\nselect * from blah where (select id from prg where prg\nQuery to find related OBs is, select ob.* from ob, prg where ob.prg_id = prg.id and prg.runid=?     instrument_configuration.sybase_ic_id, constraint.sybase_cons_id"
+        },
+        "name": {
+          "type": "string"
+        },
+        "totalExposureCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "storage: transient\napi_visibility: read only, incremented by the server",
+          "title": "Increments when this object updates"
+        },
+        "telescopePatternToken": {
+          "type": "string"
+        },
+        "telescopePatternScale": {
+          "type": "number",
+          "format": "double"
+        },
+        "megacamCumulativeSnrSystemGenerated": {
+          "type": "boolean"
+        }
+      },
+      "title": "Stored in observing_templates table in column observing_template_data"
+    },
+    "persistencePhaseScheduleObservingGroup": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+        },
+        "phaseSchedule": {
+          "$ref": "#/definitions/PhaseScheduleObservingGroupPhaseSchedule"
+        }
+      }
+    },
+    "persistenceProgramData": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "abstract": {
+          "type": "string"
+        },
+        "contactInfo": {
+          "$ref": "#/definitions/ProgramDataContactInfo"
+        },
+        "comment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProgramDataComments"
+          }
+        },
+        "sybasePiUserId": {
+          "type": "string"
+        },
+        "subTotals": {
+          "$ref": "#/definitions/persistenceSubTotalsData"
+        },
+        "token": {
+          "type": "string",
+          "description": "Unique identifier for the program. Used interchangeably with \"runid\"."
+        },
+        "timeAllocation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceAllocationData"
+          }
+        },
+        "releaseDateMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "metadataReleaseDateMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "commentField": {
+          "type": "string"
+        },
+        "programType": {
+          "$ref": "#/definitions/ProgramDataProgramType"
+        },
+        "distributionHash": {
+          "type": "string"
+        },
+        "timeAccounting": {
+          "$ref": "#/definitions/persistenceTimeAccountingData",
+          "description": "TimeAccounting for the program.\n\napi_visibility: readonly"
+        },
+        "operationsCommentField": {
+          "type": "string"
+        },
+        "lastDataAcquisitionNotificationDateMillis": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "persistenceReel": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceReelObservingBlock"
+          },
+          "title": "Order matches the configuration list"
+        },
+        "configuration": {
+          "$ref": "#/definitions/ReelConfiguration"
+        },
+        "minimumCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximum number of OBs which can be omitted but still provide science value.\nIt's main purpose is to assist the scheduling/weighting algorythm."
+        }
+      }
+    },
+    "persistenceReelObservingBlock": {
+      "type": "object",
+      "properties": {
+        "observingBlockToken": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/persistenceObservingBlockCondition"
+        }
+      }
+    },
+    "persistenceRollupValue": {
+      "type": "object",
+      "properties": {
+        "requested": {
+          "type": "string",
+          "format": "int64"
+        },
+        "started": {
+          "type": "string",
+          "format": "int64"
+        },
+        "observed": {
+          "type": "string",
+          "format": "int64"
+        },
+        "validated": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "persistenceSamplingObservingGroup": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+        },
+        "sampling": {
+          "$ref": "#/definitions/persistenceSamplingTimeConstraint"
+        }
+      }
+    },
+    "persistenceSamplingTimeConstraint": {
+      "type": "object",
+      "properties": {
+        "numberOfSamples": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minimumNumberOfSamples": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "waitPeriodMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "toleranceMinMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "toleranceMaxMillis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sampleFrequency": {
+          "type": "number",
+          "format": "double",
+          "title": "Frequency to sample at"
+        }
+      },
+      "description": "Used to sample a target at a given frequency.\n\nIt is a very simple pattern which means, observe every night if the target is visible."
+    },
+    "persistenceSingleObservingGroup": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+        }
+      },
+      "description": "SingleObservationGroup means one observing block. It's the simplest observation structure, and has no contingencies\non any other observations."
+    },
+    "persistenceSnrBlockData": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "cumulativeSnr": {
+          "type": "number",
+          "format": "double",
+          "title": "the total snr achieved of all exposures\n of all observing components of this snr block"
+        },
+        "carryForwardSnr": {
+          "type": "number",
+          "format": "double",
+          "title": "if the program is copied to a new program possibly for a new semester\n the cumulative snr will be moved to the carry_forward_snr and the\n carry forward snr will be counted in the cumulative snr of the new program"
+        },
+        "observingComponents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SnrBlockDataSnrBlockObservingComponents"
+          }
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "requestedTargetMagnitude": {
+          "type": "number",
+          "format": "double",
+          "title": "this will come from the target"
+        },
+        "requestedCumulativeSnr": {
+          "type": "number",
+          "format": "double",
+          "title": "this will come from the OT"
+        },
+        "requestedMinimumExposures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalExposures": {
+          "type": "integer",
+          "format": "int32",
+          "title": "counting the total validated exposures for this OC (OT/TARGET)"
+        },
+        "primaryObservingGroupToken": {
+          "type": "string"
+        },
+        "primaryObservingComponentToken": {
+          "type": "string"
+        },
+        "primaryObservingGroupLabel": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalConfiguredExposures": {
+          "type": "integer",
+          "format": "int32",
+          "title": "counting the total configured exposures for this OC"
+        }
+      }
+    },
+    "persistenceState": {
+      "type": "string",
+      "enum": [
+        "UNOBSERVED",
+        "OBSERVED",
+        "PROCESSED",
+        "GRADED",
+        "VALIDATED",
+        "REJECTED"
+      ],
+      "default": "UNOBSERVED",
+      "title": "- OBSERVED: For most algorithms, we treat observed and validated the same.  Observed just indicates that\nthere is a possibility it could fail validation"
+    },
+    "persistenceStokesParameter": {
+      "type": "string",
+      "enum": [
+        "Q",
+        "U",
+        "V",
+        "W",
+        "I"
+      ],
+      "default": "Q"
+    },
+    "persistenceSubTotalsData": {
+      "type": "object",
+      "properties": {
+        "etime": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "overheadtime": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "exposureCount": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "childCount": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "etimeConfigured": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "overheadTimeConfigured": {
+          "$ref": "#/definitions/persistenceRollupValue"
+        },
+        "completeness": {
+          "type": "number",
+          "format": "float",
+          "description": "Percentage completed for the entity."
+        }
+      }
+    },
+    "persistenceTargetData": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "Unique identifier for the target.\n\nWhen creating a new target, this will be inferred from the request data\nif left blank here.\n\nMust begin with the program token followed by a dash, e.g.\n20AE01-0123456789"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the target entered by PI, or primary name as resolved by CDS.\n\nWill become OBJECT in the FITS header.\n\nRequired.\nLength limited to 39 characters.\nAllowed characters are letters, numbers, spaces, or any of:\n!@#$%^\u0026*()_-+.,?/[]\u003c\u003e"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Index of the target within the program, set by the system automatically.\nUsed for reference to targets in communications with QSO staff.\n\nstorage: transient\napi_visibility: read only"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Increments when this object updates.\n\nstorage: transient\napi_visibility: read only, incremented by the server"
+        },
+        "fixedTarget": {
+          "$ref": "#/definitions/persistenceTargetDataFixedTarget",
+          "description": "Used for a target at fixed coordinates, including any provided\nproper motion."
+        },
+        "movingTarget": {
+          "$ref": "#/definitions/persistenceTargetDataMovingTarget",
+          "description": "Used for a target with motion defined by a list of ephemerides."
+        },
+        "magnitude": {
+          "$ref": "#/definitions/persistenceTargetDataMagnitude",
+          "description": "The magnitude of the target for bands which are known."
+        },
+        "temperatureEffective": {
+          "type": "number",
+          "format": "double",
+          "description": "The estimated/measured effective temperature, in Kelvin.\n\nRequired for targets observed with SPIRou or ESPaDOnS.\nNot used for MegaCam."
+        },
+        "standardStar": {
+          "type": "boolean",
+          "description": "Whether the star is a \"standard\" star, to be observed each time other\nscience targets are observed.\n\nNot used for MegaCam."
+        },
+        "linkedTargetIdentifiers": {
+          "$ref": "#/definitions/persistenceTargetDataLinkedTargetIdentifiers",
+          "description": "Identifiers linked to this target."
+        },
+        "findingChart": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceFindingChartData"
+          },
+          "description": "A read-only view of the finding charts for this target.\nTo create or update finding charts, see the FindingChartService.\n\nstorage: transient\napi_visibility: read only"
+        },
+        "pointingOffsetToken": {
+          "type": "string",
+          "description": "The token of a pointing offset which should be used when observing\nthis target.\n\nTo view or manage pointing offsets, see the PointingOffsetService."
+        },
+        "pointingOffset": {
+          "$ref": "#/definitions/observingpersistencePointingOffset",
+          "description": "A read-only view of the pointing offset which has been specified by\npointing_offset_token.\n\nTo view or manage pointing offsets, see the PointingOffsetService.\n\nstorage: transient\napi_visibility: read only"
+        }
+      }
+    },
+    "persistenceTargetDataFixedTarget": {
+      "type": "object",
+      "properties": {
+        "coordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "description": "Coordinate for this target, specified in ICRS (ep=J2000)."
+        },
+        "properMotion": {
+          "$ref": "#/definitions/TargetDataFixedTargetProperMotion",
+          "description": "Proper motions for this target."
+        },
+        "computedCoordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "description": "Internal use only.\nThe coordinate of the target at the time of observation,\nspecified in ICRS (ep=J2000).\n\nstorage: transient\napi_visibility: operations read only"
+        },
+        "estimatedRadialVelocityKmps": {
+          "type": "number",
+          "format": "double",
+          "description": "Expected radial velocity of the target in kilometers/second.\n\nUsed for targets observed with SPIRou."
+        }
+      },
+      "description": "Target at fixed coordinates, including any provided proper motion."
+    },
+    "persistenceTargetDataLinkedTargetIdentifiers": {
+      "type": "object",
+      "properties": {
+        "piConfirmedIdentifiers": {
+          "$ref": "#/definitions/persistenceTargetIdentifiers",
+          "description": "Ids confirmed by the PI through the K2 web UI, or other\nconfirmation step.\n\nWhen absent, the PI never confirmed a linking for this target."
+        },
+        "customTarget": {
+          "type": "boolean",
+          "description": "Used to indicate this is a target without known identifiers."
+        }
+      },
+      "description": "Contains identifiers discovered for this target."
+    },
+    "persistenceTargetDataMagnitude": {
+      "type": "object",
+      "properties": {
+        "U": {
+          "type": "number",
+          "format": "double",
+          "title": "U-band magnitude"
+        },
+        "B": {
+          "type": "number",
+          "format": "double",
+          "title": "B-band magnitude"
+        },
+        "V": {
+          "type": "number",
+          "format": "double",
+          "description": "Required for targets observed with ESPaDonS.",
+          "title": "V-band magnitude"
+        },
+        "R": {
+          "type": "number",
+          "format": "double",
+          "title": "R-band magnitude"
+        },
+        "I": {
+          "type": "number",
+          "format": "double",
+          "title": "I-band magnitude"
+        },
+        "G": {
+          "type": "number",
+          "format": "double",
+          "title": "G-band magnitude"
+        },
+        "J": {
+          "type": "number",
+          "format": "double",
+          "title": "J-band magnitude"
+        },
+        "H": {
+          "type": "number",
+          "format": "double",
+          "description": "Required for targets observed with SPIRou.",
+          "title": "H-band magnitude"
+        },
+        "K": {
+          "type": "number",
+          "format": "double",
+          "title": "K-band magnitude"
+        },
+        "uu": {
+          "type": "number",
+          "format": "double",
+          "title": "u-band magnitude"
+        },
+        "gg": {
+          "type": "number",
+          "format": "double",
+          "title": "g-band magnitude"
+        },
+        "rr": {
+          "type": "number",
+          "format": "double",
+          "title": "r-band magnitude"
+        },
+        "ii": {
+          "type": "number",
+          "format": "double",
+          "title": "i-band magnitude"
+        },
+        "zz": {
+          "type": "number",
+          "format": "double",
+          "title": "z-band magnitude"
+        },
+        "AB": {
+          "type": "number",
+          "format": "double",
+          "description": "Required for targets observed with MegaCam.",
+          "title": "AB magnitude"
+        }
+      },
+      "description": "Estimated/measured magnitude values per-band.\nEach value is optional, except where noted."
+    },
+    "persistenceTargetDataMovingTarget": {
+      "type": "object",
+      "properties": {
+        "ephemerisPoint": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceTargetDataMovingTargetEphemeris"
+          },
+          "description": "The ephemerides that define the path of motion for the target.\n\nMust be provided using topocentric astrometric coordinates.\nDo not provide apparent coordinates.\nCFHT strongly recommends the use of JPL Horizons System for\ngenerating the proper coordinates. CFHT's observatory code is T14.\n\nAt least five distinct positions must be provided that span the\ndesired observing period. The first position should be well in\nadvance of the observation. The positions do not need to be\nuniformly sampled throughout the desired observing period.\n\nThe points will be interpolated to determine the position of the\ntarget at the time of observation, at which point there must be\nat least one ephemeris point defined in the past, and at least\nfour defined in the future."
+        }
+      },
+      "description": "Target with motion defined by a list of ephemerides."
+    },
+    "persistenceTargetDataMovingTargetEphemeris": {
+      "type": "object",
+      "properties": {
+        "mjd": {
+          "type": "number",
+          "format": "double",
+          "description": "Modified Julian date when the target is at this coordinate."
+        },
+        "coordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "description": "Coordinate for this target at this time, specified in\nICRS (ep=J2000)."
+        },
+        "computedCoordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "description": "Internal use only.\nThe coordinate of the target at the time of observation,\nspecified in ICRS (ep=J2000).\n\nstorage: transient\napi_visibility: operations read only"
+        }
+      },
+      "description": "A time and corresponding coordinate."
+    },
+    "persistenceTargetDataOld": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "title": "Next ID: 24"
+        },
+        "name": {
+          "type": "string",
+          "description": "PI entered name for the target.\n\nWill become OBJECT in the fits header."
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "storage: transient\napi_visibility: read only, incremented by the server",
+          "title": "Increments when this object updates"
+        },
+        "referenceEquinoxJulianYears": {
+          "type": "number",
+          "format": "double",
+          "description": "The equinox this targets fixtures.coordinates were found through referenced,\nthe fixtures.coordinates will be updated with precession at observation time."
+        },
+        "useApparentTime": {
+          "type": "boolean",
+          "title": "When true, coordinates are used as is, and precession is not taken into consideration"
+        },
+        "pointingOffset": {
+          "$ref": "#/definitions/persistenceTargetDataOldPointingOffset"
+        },
+        "magnitude": {
+          "$ref": "#/definitions/TargetDataOldMagnitudeOld"
+        },
+        "temperatureEffective": {
+          "type": "number",
+          "format": "double"
+        },
+        "fixedTarget": {
+          "$ref": "#/definitions/persistenceTargetDataOldFixedTarget"
+        },
+        "moving_targets": {
+          "$ref": "#/definitions/persistenceTargetDataOldMovingTarget"
+        },
+        "findingChart": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceFindingChartData"
+          },
+          "description": "Read only representation of finding charts for convience. To update finding charts or create new ones\nsee the FindingChartsService."
+        },
+        "observingTemplateMask": {
+          "$ref": "#/definitions/persistenceObservingTemplateData",
+          "title": "Any fields here takes presidence over the exposure template"
+        },
+        "sybaseTarId": {
+          "$ref": "#/definitions/typesBigInteger"
+        },
+        "sybaseTarLabel": {
+          "type": "string"
+        },
+        "magnitudes": {
+          "$ref": "#/definitions/TargetDataOldMagnitudesOld"
+        },
+        "radialVelocity": {
+          "type": "number",
+          "format": "double"
+        },
+        "twoMassId": {
+          "type": "string"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "standardStar": {
+          "type": "boolean"
+        },
+        "radialVelocities": {
+          "$ref": "#/definitions/TargetDataOldRadialVelocityDeprecated"
+        },
+        "linkedTargetIdentifiers": {
+          "$ref": "#/definitions/persistenceTargetDataOldLinkedTargetIdentifiers",
+          "description": "Identifiers linked to this target."
+        },
+        "pointingOffsetToken": {
+          "type": "string"
+        },
+        "targetMagnitudes": {
+          "$ref": "#/definitions/persistenceTargetDataOldMagnitude"
+        }
+      },
+      "title": "Stored in targets table in column target_data"
+    },
+    "persistenceTargetDataOldFixedTarget": {
+      "type": "object",
+      "properties": {
+        "coordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate",
+          "title": "Coordinate for this target"
+        },
+        "properMotion": {
+          "$ref": "#/definitions/persistenceTargetDataOldProperMotion"
+        },
+        "computedCoordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate"
+        },
+        "estimatedRadialVelocityKmps": {
+          "type": "number",
+          "format": "double",
+          "description": "Estimated radial velocity of the target in kilometers per second."
+        },
+        "requestedRadialVelocityPrecisionMps": {
+          "type": "number",
+          "format": "double",
+          "description": "Requested radial precision for the measurement in meter per second.\n\nIf the value is absent, then accurate radial velocity measurement was not requested\nIf the  value is present, then we need to take extra care with guiding to ensure we\ncan meet the requested accuracy"
+        }
+      },
+      "description": "Target at a fixed location."
+    },
+    "persistenceTargetDataOldLinkedTargetIdentifiers": {
+      "type": "object",
+      "properties": {
+        "piConfirmedIdentifiers": {
+          "$ref": "#/definitions/persistenceTargetIdentifiers",
+          "description": "Ids confirmed by the PI through the phase 2 app, or other confirmation step.\n\nWhen absent, the PI never confirmed a linking for this target. The coordinate_search_identifiers may\nbe populated from the system and can be used for identity."
+        },
+        "customTarget": {
+          "type": "boolean"
+        },
+        "coordinateSearchIdentifiers": {
+          "$ref": "#/definitions/persistenceTargetIdentifiers",
+          "description": "api_visibility: read only",
+          "title": "Ids found from reverse catalog search by ra/dec (set internally)"
+        }
+      },
+      "description": "Contains identifiers discovered for this target through different means.\n\nImplementations should prefer reading the IDs via:\n1) human verified data\n2) computer generated data if custom_target is false."
+    },
+    "persistenceTargetDataOldMagnitude": {
+      "type": "object",
+      "properties": {
+        "U": {
+          "type": "number",
+          "format": "double"
+        },
+        "B": {
+          "type": "number",
+          "format": "double"
+        },
+        "V": {
+          "type": "number",
+          "format": "double"
+        },
+        "R": {
+          "type": "number",
+          "format": "double"
+        },
+        "I": {
+          "type": "number",
+          "format": "double"
+        },
+        "G": {
+          "type": "number",
+          "format": "double"
+        },
+        "J": {
+          "type": "number",
+          "format": "double"
+        },
+        "H": {
+          "type": "number",
+          "format": "double"
+        },
+        "K": {
+          "type": "number",
+          "format": "double"
+        },
+        "uu": {
+          "type": "number",
+          "format": "double"
+        },
+        "gg": {
+          "type": "number",
+          "format": "double"
+        },
+        "rr": {
+          "type": "number",
+          "format": "double"
+        },
+        "ii": {
+          "type": "number",
+          "format": "double"
+        },
+        "zz": {
+          "type": "number",
+          "format": "double"
+        },
+        "AB": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "persistenceTargetDataOldMovingTarget": {
+      "type": "object",
+      "properties": {
+        "ephemeris_points": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/persistenceTargetDataOldMovingTargetEphemeris"
+          }
+        }
+      },
+      "title": "Target which moves along a path"
+    },
+    "persistenceTargetDataOldMovingTargetEphemeris": {
+      "type": "object",
+      "properties": {
+        "mjd": {
+          "type": "number",
+          "format": "double"
+        },
+        "coordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate"
+        },
+        "computedCoordinate": {
+          "$ref": "#/definitions/typesSkyCoordinate"
+        }
+      },
+      "title": "the triplet of time,ra,dec"
+    },
+    "persistenceTargetDataOldPointingOffset": {
+      "type": "object",
+      "properties": {
+        "pointingName": {
+          "type": "string"
+        },
+        "pointingOffsetCoordinate": {
+          "$ref": "#/definitions/typesOffsetCoordinate"
+        },
+        "isSystem": {
+          "type": "boolean"
+        },
+        "pointingOffset": {
+          "$ref": "#/definitions/observingpersistencePointingOffset"
+        }
+      }
+    },
+    "persistenceTargetDataOldProperMotion": {
+      "type": "object",
+      "properties": {
+        "raMas": {
+          "type": "number",
+          "format": "double",
+          "title": "RA mas/yr"
+        },
+        "decMas": {
+          "type": "number",
+          "format": "double",
+          "title": "DEC mili arc seconds /year"
+        }
+      }
+    },
+    "persistenceTargetIdentifiers": {
+      "type": "object",
+      "properties": {
+        "catalogIdentifier": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/persistenceListOfIdentifiers"
+          },
+          "description": "key: catalog name, catalog_identifier.key === catalog_identifier.get(key).catalog\nvalue: catalog identifier.",
+          "title": "All catalogs resolved by simbad for this target"
+        },
+        "twoMass": {
+          "$ref": "#/definitions/persistenceCatalogIdentifier"
+        },
+        "gaia1": {
+          "$ref": "#/definitions/persistenceCatalogIdentifier"
+        },
+        "gaia2": {
+          "$ref": "#/definitions/persistenceCatalogIdentifier"
+        },
+        "resolvedCatalogIdentifier": {
+          "$ref": "#/definitions/persistenceCatalogIdentifier",
+          "description": "Contains the identifier returned by the resolution service which it determined was the\ncatalog the lookup was searching in."
+        }
+      },
+      "description": "TargetIdentifiers are a collection of identifiers which uniquely identify the target.\n\nAll possible identifiers are stored in the catalog_identifier map, but a few interesting ones to systems\nare pulled out for ease of use."
+    },
+    "persistenceTargetMonitoringObservingGroup": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+        },
+        "timeConstraint": {
+          "$ref": "#/definitions/persistenceTargetMonitoringObservingGroupTimeConstraint"
+        },
+        "sampling": {
+          "$ref": "#/definitions/persistenceTargetMonitoringObservingGroupSampling"
+        }
+      }
+    },
+    "persistenceTargetMonitoringObservingGroupSampling": {
+      "type": "object"
+    },
+    "persistenceTargetMonitoringObservingGroupTimeConstraint": {
+      "type": "object",
+      "properties": {
+        "numberOfIterations": {
+          "type": "integer",
+          "format": "int32",
+          "title": "How many observations to take"
+        },
+        "minimumNumberOfIterations": {
+          "type": "integer",
+          "format": "int32",
+          "title": "If weather becomes an issue, minimum amount of iterations that some science can still be acomplished in"
+        },
+        "timeInterval": {
+          "$ref": "#/definitions/typesDuration"
+        },
+        "timeIntervalToleranceMin": {
+          "$ref": "#/definitions/typesDuration"
+        },
+        "timeIntervalToleranceMax": {
+          "$ref": "#/definitions/typesDuration"
+        },
+        "t0Millis": {
+          "type": "string",
+          "format": "int64",
+          "description": "T0 the monitor should start at.\n\noptional, if omitted CFHT will start observing at QC's discretion"
+        },
+        "withinSameCameraRun": {
+          "type": "boolean"
+        }
+      }
+    },
+    "persistenceTargetTimeData": {
+      "type": "object",
+      "properties": {
+        "requestedIntegrationTime": {
+          "$ref": "#/definitions/persistenceITimeData",
+          "description": "Integration time calculated by the system for the configured entity.",
+          "readOnly": true
+        },
+        "actualIntegrationTime": {
+          "$ref": "#/definitions/persistenceITimeData",
+          "description": "Integration time spent on sky (may be different than the system calculated time).",
+          "readOnly": true
+        },
+        "view": {
+          "$ref": "#/definitions/TargetTimeDataView",
+          "description": "Which view should be presented when not querying a specific value.\n\nBusiness rules determine which value to show the user.\nClients should use this field to display requested or actual times when both cannot be displayed.\nContact the CFHT QSO Team for more information.",
+          "readOnly": true
+        }
+      },
+      "description": "Contains the requested ITime and the actual ITime.",
+      "title": "Target Time",
+      "readOnly": true
+    },
+    "persistenceTelescopePattern": {
+      "type": "object",
+      "properties": {
+        "offsets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TelescopePatternOffset"
+          },
+          "title": "Should only be set if manually specifying custom dithering patterns"
+        },
+        "config": {
+          "$ref": "#/definitions/TelescopePatternConfig"
+        },
+        "token": {
+          "type": "string"
+        },
+        "label": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "userToken": {
+          "type": "string"
+        },
+        "instrument": {
+          "$ref": "#/definitions/typesInstrumentType"
+        },
+        "isSystem": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "offsetCoordinate": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/typesOffsetCoordinate"
+          }
+        }
+      },
+      "title": "Part of observing_template_data - pattern entity stored in pattern table"
+    },
+    "persistenceTimeAccountingData": {
+      "type": "object",
+      "properties": {
+        "configuredTime": {
+          "$ref": "#/definitions/persistenceITimeData",
+          "description": "The time that will be charged for the entity if validated within configured constraints.",
+          "readOnly": true
+        },
+        "chargedTime": {
+          "$ref": "#/definitions/persistenceTargetTimeData",
+          "description": "The amount of time charged for the entity.",
+          "readOnly": true
+        },
+        "validatedTimeOnSky": {
+          "$ref": "#/definitions/persistenceTargetTimeData",
+          "description": "The time spent observing validated exposures (including repeats) for the entity.",
+          "readOnly": true
+        },
+        "timeOnSky": {
+          "$ref": "#/definitions/persistenceTargetTimeData",
+          "description": "The time spent observing *ALL* exposures (repeats, validated, or not validated) for the entity.",
+          "readOnly": true
+        },
+        "timeAccountingStatus": {
+          "$ref": "#/definitions/TimeAccountingDataTimeAccountingStatus",
+          "description": "The state for the entity.",
+          "readOnly": true
+        },
+        "completionRatio": {
+          "type": "number",
+          "format": "double",
+          "description": "Entity completion ratio.",
+          "readOnly": true,
+          "maximum": 1
+        }
+      },
+      "description": "Specific parameters for tracking observatory time usage by a scientific program.\n\nEach parameter is an object that belongs to an entity which describes a series of exposures.",
+      "title": "Time Accounting",
+      "readOnly": true
+    },
+    "persistenceTransientObservingGroup": {
+      "type": "object",
+      "properties": {
+        "observingBlock": {
+          "$ref": "#/definitions/persistenceObservingGroupDataObservingBlock"
+        },
+        "constraint": {
+          "$ref": "#/definitions/observingpersistenceTimeConstraint"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "typeUrl": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "typesBigInteger": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": "Used for primary database fields in sybase\nShould be parsed as a BigInteger"
+    },
+    "typesDoubleMinMax": {
+      "type": "object",
+      "properties": {
+        "min": {
+          "type": "number",
+          "format": "double"
+        },
+        "max": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "typesDuration": {
+      "type": "object",
+      "properties": {
+        "millis": {
+          "type": "string",
+          "format": "int64"
+        },
+        "displayUnit": {
+          "$ref": "#/definitions/typesDurationUnit",
+          "title": "Only needed for rendering UI, should display the duration using the units specified.\nIf unset, assume DAYS"
+        }
+      }
+    },
+    "typesDurationUnit": {
+      "type": "string",
+      "enum": [
+        "DAYS",
+        "HOURS",
+        "MINUTES",
+        "SECONDS"
+      ],
+      "default": "DAYS"
+    },
+    "typesExposureType": {
+      "type": "string",
+      "enum": [
+        "OBJECT",
+        "TARGET",
+        "SKY",
+        "DARK",
+        "FLAT",
+        "SNAP",
+        "BIAS",
+        "FOCUS",
+        "ALIGN",
+        "COMPARISON",
+        "ACQUIRE",
+        "FABRY_PEROT",
+        "TWILIGHT_FLATS",
+        "PHOTOMETRY",
+        "SFOCUS"
+      ],
+      "default": "OBJECT"
+    },
+    "typesInstrumentType": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CFH12K",
+        "MEGACAM",
+        "WIRCAM",
+        "ESPADONS",
+        "SITELLE",
+        "SPIROU",
+        "WENAOKEAO"
+      ],
+      "default": "UNKNOWN"
+    },
+    "typesOffsetCoordinate": {
+      "type": "object",
+      "properties": {
+        "raOffset": {
+          "type": "number",
+          "format": "double",
+          "description": "Offset in the Right Ascension axis in arcsec of degrees.",
+          "title": "Right Ascension Offset",
+          "maximum": 1296000,
+          "minimum": -1296000
+        },
+        "decOffset": {
+          "type": "number",
+          "format": "double",
+          "description": "Offset in the Declination axis in arcsec of degrees.",
+          "title": "Declination Offset",
+          "maximum": 324000,
+          "minimum": -324000
+        },
+        "exposureNumber": {
+          "type": "number",
+          "format": "int64",
+          "description": "Exposure number",
+          "title": "Exposure number",
+          "maximum": 99
+        }
+      },
+      "description": "Specify an on sky location relative to another known position.",
+      "title": "Offset Coordinate"
+    },
+    "typesSkyCoordinate": {
+      "type": "object",
+      "properties": {
+        "ra": {
+          "type": "number",
+          "format": "double",
+          "description": "Right Ascension in degrees.",
+          "title": "Right Ascension",
+          "maximum": 360
+        },
+        "dec": {
+          "type": "number",
+          "format": "double",
+          "description": "Declination in degrees.",
+          "title": "Declination",
+          "maximum": 90,
+          "minimum": -90
+        }
+      },
+      "description": "Specify an on sky location via right ascension and declination.",
+      "title": "Sky Coordinate"
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "description": "API keys can be sent in the authorization header as 'Authorization: Bearer \u003ckey\u003e'. Create one here: https://kealahou.cfht.hawaii.edu/account/token-manager",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "Bearer": []
+    }
+  ],
+  "externalDocs": {
+    "description": "Kealahou API Examples",
+    "url": "https://github.com/CFHT/kealahou-workshop/tree/main"
+  }
+}

@@ -1,0 +1,166 @@
+syntax = "proto3";
+
+package cfhtapi.observing;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/piapi";
+option java_package = "edu.hawaii.cfht.protos.observing.piapi";
+option java_outer_classname = "TargetServiceProtos";
+option java_multiple_files = true;
+option java_generic_services = true;
+
+import "cfhtapi/http.proto";
+import "cfhtapi/observing/persistence/target_data.proto";
+import "cfhtapi/options.proto";
+import "cfhtapi/types.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+import "protoc_gen_openapiv2/options/annotations.proto";
+
+message TargetUpdateRequest {
+    // Unique identifier for your science program.
+    string runid = 1;
+
+    // Target data to be created or updated.
+    cfhtapi.observing.persistence.TargetData entity = 2;
+
+    /* Unique identifier of the target. If a target with this token already
+     * exists, it will be updated, otherwise it will be created. */
+    string token = 3;
+
+    /* If specified, the endpoint will use optimistic locking instead of last
+     * write wins. This should be set to the current version on entity. */
+    google.protobuf.Int32Value lock_version = 4;
+
+    /* If specified, instrument-specific validation checks will be performed */
+    cfhtapi.types.InstrumentType instrument = 5;
+}
+
+message TargetUpdateResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+    cfhtapi.observing.persistence.TargetData entity = 3;
+}
+
+message TargetListRequest {
+    // Unique identifier the science program.
+    string runid = 1;
+
+    enum TargetType {
+        ALL = 0;
+        FIXED = 1;
+        MOVING = 2;
+    }
+
+    // Filter the returned targets to only include the type specified.
+    TargetType target_type = 2;
+}
+
+message TargetListResponse {
+    bool success = 1;
+    repeated cfhtapi.observing.persistence.TargetData entity = 2;
+    cfhtapi.http.Errors error = 3;
+}
+
+message TargetShowRequest {
+    // Unique identifier your science program.
+    string runid = 1;
+
+    /* Unique identifier of the target. */
+    string token = 2;
+}
+
+message TargetShowResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+    cfhtapi.observing.persistence.TargetData entity = 3;
+}
+
+message TargetDeleteRequest {
+    // Unique identifier your science program.
+    string runid = 1;
+
+    /* Unique identifier of the target. */
+    string token = 2;
+}
+
+message TargetDeleteResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+}
+
+message EphemeridesUpdateRequest {
+
+    // Unique identifier your science program.
+    string runid = 1;
+
+    // Unique identifier of the target.
+    string token = 2;
+
+    // List of ephemerides to set on the target.
+    repeated cfhtapi.observing.persistence.TargetData.MovingTarget.Ephemeris ephemeris = 3;
+}
+
+message EphemeridesUpdateResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+    cfhtapi.observing.persistence.TargetData entity = 3;
+}
+
+service TargetService {
+    rpc CreateOrUpdateTarget (TargetUpdateRequest) returns (TargetUpdateResponse) {
+        option (google.api.http) = {
+            put: "/programs/{runid}/targets/{token}"
+            body: "*"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create or update the specified target.";
+            description: "Creates or updates a target.";
+        };
+    }
+
+    rpc ListTarget (TargetListRequest) returns (TargetListResponse) {
+        option (google.api.http) = {
+            get: "/programs/{runid}/targets"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Lists all targets for the specified program.";
+            description: "Returns a list of targets.";
+        };
+    }
+
+    rpc ShowTarget (TargetShowRequest) returns (TargetShowResponse) {
+        option (google.api.http) = {
+            get: "/programs/{runid}/targets/{token}"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Show details of the specified target.";
+            description: "Returns details on given target.";
+        };
+    }
+
+    rpc DeleteTarget (TargetDeleteRequest) returns (TargetDeleteResponse) {
+        option (google.api.http) = {
+            delete: "/programs/{runid}/targets/{token}"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Deletes the specified target.";
+            description: "Deletes the given target.";
+        };
+    }
+
+    rpc UpdateEphemerides (EphemeridesUpdateRequest) returns (EphemeridesUpdateResponse) {
+        option (google.api.http) = {
+            put: "/programs/{runid}/targets/{token}/ephemerides"
+            body: "*"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}/ephemerides";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Updates the ephemerides for the specified target.";
+            description: "Updates the given target's ephemerides.";
+        };
+    }
+}
