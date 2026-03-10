@@ -71,7 +71,7 @@ def api_request(endpoint, data=None, method='GET'):
         raise Exception('API request failed, but no error message was given')
 
 
-class EntityCrudApi[T]:
+class EntityCrudApi:
     """
     Wrapper around the Kealahou API CRUD methods for a given program and entity type.
     """
@@ -79,15 +79,15 @@ class EntityCrudApi[T]:
     def __init__(self, program_token: str, entity_type: str):
         self.path_prefix = f'/programs/{program_token}/{entity_type}'
 
-    def list(self) -> list[T]:
+    def list(self) -> list[dict]:
         api_response = api_request(f'{self.path_prefix}')
         return api_response['entity']
 
-    def show(self, token: str) -> T:
+    def show(self, token: str) -> dict:
         api_response = api_request(f'{self.path_prefix}/{token}')
         return api_response['entity']
 
-    def create_or_update(self, entity: T, request_aux_data: dict = {}) -> dict:
+    def create_or_update(self, entity: dict, request_aux_data: dict = {}) -> dict:
         version = entity.get('version', None)
         lock_version = {
             'value': version,
@@ -113,7 +113,7 @@ def example_fixed_target(program_token: str, instrument: INSTRUMENT):
                 'dec': random.uniform(-90, 90),
             },
             'proper_motion': {},
-            'estimated_radial_velocity_kmps': {'value': 234.0} if instrument is 'SPIROU' else None,
+            'estimated_radial_velocity_kmps': {'value': 234.0} if instrument == 'SPIROU' else None,
         },
         'magnitude': {
         },
@@ -212,11 +212,11 @@ def target_api_examples(program_token: str, instrument: INSTRUMENT):
     update_target = target
     update_target['standard_star'] = True
     target = target_api.create_or_update(update_target, {'instrument': instrument})
-    print(f"Updated T{target['label']} - {target['name']} [token = {target['token']}]  (version={target['version']})")
+    print(f"Updated T{target['label']} - {target['name']} [token = {target['token']}] (version={target['version']})")
     print()
 
     # Attempt to update target again with stale version
-    update_target['standard_star'] = False
+    # NOTE: This doesn't seem to be working correctly on staging as of 2026-03-09... under investigation
     try:
         target_api.create_or_update(update_target, {'instrument': instrument})
     except Exception as e:
@@ -300,7 +300,7 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
 
     # Attempt to delete the target that is used in an observing group
     try:
-        target_api.show(target['token'])
+        target_api.delete(target['token'])
     except Exception as e:
         print(f'Target delete failed - {e}')
         print()
@@ -317,7 +317,9 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     response = api_request(f'/programs/{program_token}/exposures')
     print(f'All exposures for {program_token}:')
     for exp in response['exposure']:
-        print(f"{exp['obsid']} (OG{exp['observing_group_context']['observing_group_label']}, {exp['target']['name']})")
+        print(f"{exp['obsid']} "
+              f"(OG{exp['observing_group_context']['observing_group_label']}, "
+              f"{exp['target_data']['name']})")
     print()
     print()
 
