@@ -77,7 +77,7 @@ class EntityCrudApi:
     """
 
     def __init__(self, program_token: str, entity_type: str):
-        self.path_prefix = f'/programs/{program_token}/{entity_type}'
+        self.path_prefix = f'programs/{program_token}/{entity_type}'
 
     def list(self) -> list[dict]:
         api_response = api_request(f'{self.path_prefix}')
@@ -150,7 +150,7 @@ def target_api_examples(program_token: str, instrument: INSTRUMENT):
     """
     print(f'Running through target API examples for {program_token}...')
     print()
-    target_api = EntityCrudApi[dict](program_token, 'targets')
+    target_api = EntityCrudApi(program_token, 'targets')
 
     # List targets
     targets = target_api.list()
@@ -266,7 +266,7 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     print()
 
     # List observing templates
-    response = api_request(f'/programs/{program_token}/observing-templates')
+    response = api_request(f'programs/{program_token}/observing-templates')
     print(f'All observing templates for {program_token}:')
     for ot in response['observing_template']:
         print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
@@ -274,7 +274,7 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     first_ot = response['observing_template'][0]  # Save for later example
 
     # Create new target
-    target_api = EntityCrudApi[dict](program_token, 'targets')
+    target_api = EntityCrudApi(program_token, 'targets')
     target = target_api.create_or_update(example_fixed_target(program_token, instrument))
 
     # Create new basic OG from new target
@@ -314,7 +314,7 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     target_api.delete(target['token'])
 
     # List exposures
-    response = api_request(f'/programs/{program_token}/exposures')
+    response = api_request(f'programs/{program_token}/exposures')
     print(f'All exposures for {program_token}:')
     for exp in response['exposure']:
         print(f"{exp['obsid']} "
