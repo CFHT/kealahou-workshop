@@ -97,3 +97,4 @@ To run these examples yourself, make sure to set up an access token first, as de
 There are some brief examples of accessing the API using cURL in [curl_examples.md](curl_examples.md).
 
 For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py).
+This script should work with Python 3.10 or newer.

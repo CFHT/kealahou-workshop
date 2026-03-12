@@ -92,7 +92,7 @@ class EntityCrudApi:
         lock_version = {
             'value': version,
         } if version else None
-        api_response = api_request(f'{self.path_prefix}/{entity['token']}', method='PUT', data={
+        api_response = api_request(f"{self.path_prefix}/{entity['token']}", method='PUT', data={
             'entity': entity,
             'lock_version': lock_version,  # Use version-locking to prevent accidental overwrites
             **request_aux_data,
