@@ -216,8 +216,10 @@ def target_api_examples(program_token: str, instrument: INSTRUMENT):
     print()
 
     # Attempt to update target again with stale version
-    # NOTE: This doesn't seem to be working correctly on staging as of 2026-03-09... under investigation
     try:
+        # If we send the exact same update request twice, the duplicate would be safely ignored...
+        # But if we change a value on the request and have a stale version, it will throw a conflict HTTP error
+        update_target['temperature_effective'] = 2345.6
         target_api.create_or_update(update_target, {'instrument': instrument})
     except Exception as e:
         print(f'Target update failed - {e}')
