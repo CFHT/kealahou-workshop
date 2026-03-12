@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package cfhtapi.observing.persistence;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/persistence";
+option java_package = "edu.hawaii.cfht.protos.observing.persistence";
+option java_multiple_files = true;
+option java_generic_services = true;
+
+/* Ties to some external system.
+ *
+ * A string representation can take the form of <catalog>:<identifier> */
+message CatalogIdentifier {
+    /* Catalog to reference. */
+    string catalog = 1;
+    /* Valid identifier in the catalog.
+     *
+     * Note: this ID will contain a catalog name, because spacing matters in catalogs, the full ID for an object is like
+     * M    4. Catalog is M, id is identifier could be 4, but to reference m4, you need the spaces.
+     *
+     * NB: These identity values can not be set in fits headers because they do not have to conform to
+     * the length restrictions. */
+    string identifier = 2;
+}
+
+message ListOfIdentifiers {
+    repeated CatalogIdentifier catalog_identifier = 1;
+}
+
+/* TargetIdentifiers are a collection of identifiers which uniquely identify the target.
+ *
+ * All possible identifiers are stored in the catalog_identifier map, but a few interesting ones to systems
+ * are pulled out for ease of use. */
+message TargetIdentifiers {
+    /* All catalogs resolved by simbad for this target
+     *
+     * key: catalog name, catalog_identifier.key === catalog_identifier.get(key).catalog
+     * value: catalog identifier. */
+    map<string, ListOfIdentifiers> catalog_identifier = 1;
+
+    CatalogIdentifier two_mass = 2;
+
+    CatalogIdentifier gaia1 = 3;
+
+    CatalogIdentifier gaia2 = 4;
+
+    /* Contains the identifier returned by the resolution service which it determined was the
+     * catalog the lookup was searching in. */
+    CatalogIdentifier resolved_catalog_identifier = 5;
+
+    // Feel free to add more
+}
