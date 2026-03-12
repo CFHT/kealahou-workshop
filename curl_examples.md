@@ -21,15 +21,15 @@ The K2 web interface uses this under the hood to get and set data.
 
 List all targets for a program:
 ```
-curl --header @.kealahou_headers -X GET https://api-stage.cfht.hawaii.edu/programs/23AQ78/targets | jq
+curl --header @.kealahou_headers -X GET https://api-stage.cfht.hawaii.edu/programs/25BE25/targets | jq
 ```
 
 List all fixed targets for a program:
 ```
-curl --header @.kealahou_headers -X GET --data "{target_type: FIXED}" https://api-stage.cfht.hawaii.edu/programs/23AQ78/targets | jq
+curl --header @.kealahou_headers -X GET --data "{target_type: FIXED}" https://api-stage.cfht.hawaii.edu/programs/25BE25/targets | jq
 ```
 
 List a single target for a program:
 ```
-curl --header @.kealahou_headers -X GET https://api-stage.cfht.hawaii.edu/programs/23AQ78/targets/23AQ78-56301200080000295183 | jq
+curl --header @.kealahou_headers -X GET https://api-stage.cfht.hawaii.edu/programs/25BE25/targets/25BE25-1758314224958 | jq
 ```

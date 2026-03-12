@@ -82,17 +82,13 @@ The examples in this project will assume this token has been saved into a file i
 
 ### Documentation
 
-A Swagger page of the completed API endpoints is available in the project: [api.swagger.json](api.swagger.json).
+A Swagger API documentation site with the completed API endpoints is available at: https://swagger-stage.cfht.hawaii.edu/
 
 The original [proto files](proto) can also be viewed for a more direct view of documentation for each field.
 
-Additionally, a Swagger API documentation site is also available - URL: **https://swagger-stage.cfht.hawaii.edu/**
-
-Please note that some inline documentation for fields in PUT methods is not showing due to a technical issue. Refer to the [proto files](proto) for full details. 
-
 **Disclaimer** 
 The API is undergoing ongoing cleanup and improvements.
-This should be considered a preview version, where any and all pieces are subject to change.
+This should be considered a preview version subject to change, except where explicitly noted.
 
 ### API Usage Examples
 

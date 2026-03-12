@@ -11,13 +11,11 @@ option java_generic_services = true;
 
 import "cfhtapi/observing/persistence/pointing_offset.proto";
 import "cfhtapi/observing/persistence/finding_chart_data.proto";
-import "cfhtapi/observing/persistence/observing_template_data.proto";
 import "cfhtapi/observing/persistence/target_identifiers.proto";
 import "cfhtapi/options.proto";
 import "cfhtapi/types.proto";
 import "google/protobuf/wrappers.proto";
 
-/* Stored in targets table in column target_data */
 message TargetData {
 
     /* Unique identifier for the target.
