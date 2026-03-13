@@ -20,7 +20,7 @@ BASE_URL = 'https://api-stage.cfht.hawaii.edu'
 
 INSTRUMENT = Literal['SPIROU', 'ESPADONS', 'MEGACAM']
 access_token = None
-versbose = False
+verbose = False
 example = 0
 
 example_list = { 
@@ -55,7 +55,14 @@ def api_request(endpoint, data=None, method='GET'):
         'Authorization': f'Bearer {access_token}',
         'Content-Type': 'application/json',
     }
+
     url = f'{BASE_URL}/{endpoint}'
+    
+    if (verbose):
+        print(f"Request\n full URL: {url}")
+        print(f"Data: {data}")
+        print(f"Headers: {headers}")
+
     request = Request(url, json.dumps(data).encode('utf-8'), headers, method=method)
     http_error = None
     try:
@@ -81,19 +88,27 @@ def api_request(endpoint, data=None, method='GET'):
 
 ### DD adds: Small and focused:
 
-def get_target_list_example(program_token, instrument=INSTRUMENT):
+def get_target_list_example():
     """
     Example to get the target list
     """
-    try:
-        response = api_request(f'/programs/{program_token}/targets')
-    except Exception as e:
-        print('API request to get list targets failed')
-        
-    print(f'All targets for {program_token}:')
-    for target in response['entity']:
-        print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
-    print()
+
+    print("#" * 80)
+    print("Displaying Program List")
+    print("#" * 80)
+    
+    response = api_request('programs')
+    programs = response['entity']
+    for program in programs:
+        program_token = program['program_data']['token']
+        try:
+            response = api_request(f'/programs/{program_token}/targets')
+        except Exception as e:
+            print('API request to get list targets failed')
+            
+        print(f'All targets for {program_token}:')
+        for target in response['entity']:
+            print(f"T{target['label']} - {target['name']} [token = {target['token']}]")        
 
 def get_program_list_example():
     """
@@ -101,6 +116,11 @@ def get_program_list_example():
 
     Prints JSON attributes
     """
+
+    print("#" * 80)
+    print("Displaying Program List")
+    print("#" * 80)
+
     # List programs
     response = api_request('programs')
     programs = response['entity']
@@ -123,6 +143,9 @@ def get_pointing_offset_example():
     """
     global INSTRUMENT
     
+    print("#" * 80)
+    print("Displaying Offests")
+    print("#" * 80)
     # Check for offsets in each instrument and print out.
     for instrument_name in get_args(INSTRUMENT):
         response = api_request('pointing_offset', data={                
@@ -207,6 +230,8 @@ def main():
             get_program_list_example()
         case 2:
             get_pointing_offset_example()
+        case 3:
+            get_target_list_example()
         case 4:
             get_program_list_example()
             get_pointing_offset_example()
