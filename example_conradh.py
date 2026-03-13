@@ -11,7 +11,7 @@ is better suited for submitting HTTP requests than the stock Python urllib.
 import json
 import random
 import argparse
-from typing import Literal
+from typing import Literal, get_args
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -21,7 +21,14 @@ BASE_URL = 'https://api-stage.cfht.hawaii.edu'
 INSTRUMENT = Literal['SPIROU', 'ESPADONS', 'MEGACAM']
 access_token = None
 versbose = False
-example = 'all'
+example = 0
+
+example_list = { 
+            1: 'List Pointing Offesets', 
+            2: 'List Programs',
+            3: 'Show Targets',
+            4: 'Show All Examples'
+        }
 
 required_mag_by_instrument: dict[INSTRUMENT, str] = {
     'SPIROU': 'H',
@@ -32,6 +39,14 @@ required_mag_by_instrument: dict[INSTRUMENT, str] = {
 def api_request(endpoint, data=None, method='GET'):
     """
     Submit a request to the Kealahou API, and condense any errors into a consistent error message format.
+
+    Params:
+    endpoint - String Added to the API url
+    data - JSON for additional variables.
+    method - Default GET, but also available for POST and DELETE.
+
+    Returns:
+        response as JSON format.
     """
 
     if data is None:
@@ -80,9 +95,11 @@ def get_target_list_example(program_token, instrument=INSTRUMENT):
         print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
     print()
 
-def get_programs_list_example():
+def get_program_list_example():
     """
     Simple API example to list programs
+
+    Prints JSON attributes
     """
     # List programs
     response = api_request('programs')
@@ -92,23 +109,33 @@ def get_programs_list_example():
         print(f"Program ID: {program['program_data']['token']}")
         print(f"Instrument: {program['program_data']['time_allocation'][0]['instrument']}")
         print(f"Time allocated: {program['program_data']['time_allocation'][0]['time_allocated_millis']/(1000*3600)} hours")        
-        print(f"============================")
+        print("#" * 80)
 
+    # Print JSON if verbose
     if (verbose):
         print(json.dumps(response, indent=4, sort_keys=True))
         
 def get_pointing_offset_example():
-    response = api_request('programs')
-    programs = response['entity']
-    for program in programs:        
-            instrument = program['program_data']['time_allocation'][0]['instrument']
-            response = api_request('pointing_offset', data={                
-                'instrument': instrument
+    """
+    Simple API example to list offsets for each instrument
+
+    Prints JSON attributes
+    """
+    global INSTRUMENT
+    
+    # Check for offsets in each instrument and print out.
+    for instrument_name in get_args(INSTRUMENT):
+        response = api_request('pointing_offset', data={                
+                'instrument': instrument_name
                 })
-            offsets = response['entity']
-            for offset in offsets:
-                print(f"Offset: {program['offset']}")
-            print(f"============================")
+        offsets = response['entity']
+        
+        for offset in offsets:
+            if ('ra_offset' in offset['offset'] and 'dec_offset' in offset['offset']):
+                print(f"Offset: Ra offset: {offset['offset']['ra_offset']} Dec offset: {offset['offset']['dec_offset']}")
+                print("#" * 80)
+
+            
     if (verbose):
         print(json.dumps(response, indent=4, sort_keys=True))
 
@@ -120,9 +147,10 @@ def process_options():
         Parameters: None.
         Returns: Nothing.
     """
-    global access_token, verbose, api_url, examples
+    global access_token, verbose, api_url, example
 
-    parser = argparse.ArgumentParser(description="This script shows examples of using the Kealahou API for PI program management.")
+    parser = argparse.ArgumentParser(description="This script shows examples of using the Kealahou API for PI program management.",
+                                     formatter_class=argparse.RawTextHelpFormatter)
 
     # Check for token file.
     parser.add_argument('--token_file', '-t',
@@ -144,7 +172,12 @@ def process_options():
                     choices=[1,2,3,4],
                     default=4,
                     type=int,
-                    help='Options for specific examples: Choose integer: 1 - Pointing Offeset 2 - List Programs 3 - Show Targets 4 - Show all examples')
+                    help='Options for specific examples. Choose integer:\n'+
+                          '\t1 - List Pointing Offesets \n'+
+                          '\t2 - List Programs \n'+
+                          '\t3 - Show Targets \n'+
+                          '\t4 - Show all examples\n'
+                          )
     
     # verbose output.
     parser.add_argument('--verbose', '-v',
@@ -167,12 +200,19 @@ def process_options():
 
 def main():
     process_options()
-    #get_programs_list_example()
-    get_pointing_offset_example()
-    # List programs
     
+    print(f"Show example: {example_list[example]}")
+    match example:
+        case 1:
+            get_program_list_example()
+        case 2:
+            get_pointing_offset_example()
+        case 4:
+            get_program_list_example()
+            get_pointing_offset_example()
+        case _:
+            print(f"Unkown Option: {example}.")
     
-
 if __name__ == '__main__':
     main()
 
