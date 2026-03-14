@@ -24,8 +24,8 @@ verbose = False
 example = 0
 
 example_list = { 
-            1: 'List Pointing Offesets', 
-            2: 'List Programs',
+            1: 'List Programs',
+            2: 'List Pointing Offesets',
             3: 'Show Targets',
             4: 'Show All Examples'
         }
@@ -58,10 +58,11 @@ def api_request(endpoint, data=None, method='GET'):
 
     url = f'{BASE_URL}/{endpoint}'
     
-    if (verbose):
+    if (verbose):        
         print(f"Request\n full URL: {url}")
         print(f"Data: {data}")
         print(f"Headers: {headers}")
+        print("#" * 80)
 
     request = Request(url, json.dumps(data).encode('utf-8'), headers, method=method)
     http_error = None
@@ -93,8 +94,7 @@ def get_target_list_example():
     Example to get the target list
     """
 
-    print("#" * 80)
-    print("Displaying Program List")
+    print("Displaying Target List")
     print("#" * 80)
     
     response = api_request('programs')
@@ -108,7 +108,8 @@ def get_target_list_example():
             
         print(f'All targets for {program_token}:')
         for target in response['entity']:
-            print(f"T{target['label']} - {target['name']} [token = {target['token']}]")        
+            print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
+        print("#" * 80)
 
 def get_program_list_example():
     """
@@ -117,7 +118,6 @@ def get_program_list_example():
     Prints JSON attributes
     """
 
-    print("#" * 80)
     print("Displaying Program List")
     print("#" * 80)
 
@@ -143,7 +143,6 @@ def get_pointing_offset_example():
     """
     global INSTRUMENT
     
-    print("#" * 80)
     print("Displaying Offests")
     print("#" * 80)
     # Check for offsets in each instrument and print out.
@@ -222,9 +221,10 @@ def process_options():
     example = args.example
 
 def main():
-    process_options()
-    
-    print(f"Show example: {example_list[example]}")
+    process_options()  
+    print("#" * 80)  
+    print(f"Chosen example: {example_list[example]}")
+    print("#" * 80)
     match example:
         case 1:
             get_program_list_example()
@@ -235,9 +235,9 @@ def main():
         case 4:
             get_program_list_example()
             get_pointing_offset_example()
+            get_target_list_example()
         case _:
             print(f"Unkown Option: {example}.")
     
 if __name__ == '__main__':
     main()
-
