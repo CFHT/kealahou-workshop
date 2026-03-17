@@ -16,7 +16,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 KEY_FILE = '.access_token'
-BASE_URL = 'https://api.cfht.hawaii.edu'
+BASE_URL = 'https://api-stage.cfht.hawaii.edu'
 
 INSTRUMENT = Literal['SPIROU', 'ESPADONS', 'MEGACAM']
 access_token = None
