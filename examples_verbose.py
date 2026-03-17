@@ -195,8 +195,8 @@ def process_options():
                     default=4,
                     type=int,
                     help='Options for specific examples. Choose integer:\n'+
-                          '\t1 - List Pointing Offesets \n'+
-                          '\t2 - List Programs \n'+
+                          '\t1 - List Programs \n'+
+                          '\t2 - List Pointing Offsets \n'+
                           '\t3 - Show Targets \n'+
                           '\t4 - Show all examples\n'
                           )
