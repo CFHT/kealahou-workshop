@@ -123,13 +123,15 @@ def example_fixed_target(program_token: str, instrument: INSTRUMENT):
         'name': 'DD target 1',
         'fixed_target': {
             'coordinate': {
-                'ra': random.uniform(0, 359.9999),
+                'ra': random.uniform(0, 359.9999), #Values are in decimal degrees.
                 'dec': random.uniform(-90, 90),
             },
-            'proper_motion': {},
+            'proper_motion': {'ra_mas': -15.468, 'dec_mas': 12.5},
             'estimated_radial_velocity_kmps': {'value': 234.0} if instrument == 'SPIROU' else None,
         },
-        'magnitude': {
+        'magnitude': {'AB' if instrument == 'MEGACAM' else 
+                      'H' if instrument == 'SPIROU' else 
+                      'V' if instrument == 'ESPADONS' else 0: {'value': 25.0}
         },
         'temperature_effective': 1234.5,
         'standard_star': False,
@@ -149,7 +151,9 @@ def example_moving_target(program_token: str, instrument: INSTRUMENT):
                 },
             } for i in range(0, 5)],
         },
-        'magnitude': {
+        'magnitude': {'AB' if instrument == 'MEGACAM' else 
+                      'H' if instrument == 'SPIROU' else 
+                      'V' if instrument == 'ESPADONS' else 0: {'value': 25.0}
         },
         'temperature_effective': 1234.5,
         'standard_star': False,
@@ -168,7 +172,8 @@ def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target
     except Exception as e:
         print(f"Problem adding new target to {program_token} on {instrument} - {e}.")
 
-    #print(f"Added new target to {program_token} on {instrument}")
+    if verbose or vverbose:
+        print(target_api)
 
 def get_target_list_example():
     """
@@ -204,18 +209,18 @@ def get_program_list_example(output=True):
     """
     Simple API example to list programs
 
-    Prints JSON attributes
+    Prints or return JSON attributes
     """
-
+    response = api_request('programs')
+    programs = response['entity']
+    
     if output:
         print("Displaying Program List")
         print("#" * 80)
 
-    # List programs
-    response = api_request('programs')
-    programs = response['entity']
-    for program in programs:
-        if output:
+        # List programs
+
+        for program in programs:
             print("#" * 80)
             print(f"Title: {program['program_data']['title']}")
             print(f"Program ID: {program['program_data']['token']}")
@@ -223,13 +228,13 @@ def get_program_list_example(output=True):
             print(f"Time allocated: {program['program_data']['time_allocation'][0]['time_allocated_millis']/(1000*3600)} hours")        
             print("-" * 80)
             print(f"API program keys/values:")
-        if (verbose):
-            print(f"Program {program['program_data']['token']}: {json.dumps(program['program_data'],indent=4,sort_keys=True)}")
-
-    # Print JSON if verbose
-    if (vverbose):
-        print(f"Response: {json.dumps(response, indent=4, sort_keys=True)}")
-
+            if (verbose):
+                print(f"Program {program['program_data']['token']}: {json.dumps(program['program_data'],indent=4,sort_keys=True)}")
+    
+        # Print JSON if verbose
+        if (vverbose):
+            print(f"Response: {json.dumps(response, indent=4, sort_keys=True)}")
+    
     return programs
         
 def get_megacam_default_pointing_offset_example():
@@ -342,10 +347,10 @@ def main():
             get_target_list_example()
         case 4:
             programs = get_program_list_example(output=False)
-            program = programs[0]['program_data']
+            program = programs[3]['program_data']
             progid = program['token']
             instrument = program['time_allocation'][0]['instrument']
-            set_target_example(progid,instrument)
+            #set_target_example(progid,instrument)
             set_target_example(progid,instrument,moving_target=True)
         case 5:
             pass
