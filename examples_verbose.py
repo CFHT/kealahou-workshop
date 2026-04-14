@@ -1,5 +1,4 @@
 """
-zz
 Examples of using the Kealahou API for PI program management.
 All API interactions in these examples should be considered as non-final design, and subject to change.
 
