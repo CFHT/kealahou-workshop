@@ -169,12 +169,12 @@ def example_moving_target(program_token: str, instrument: INSTRUMENT):
         'standard_star': False,
         'pointing_offset_token': f'00AZ00-PO+{instrument}+1',
     }
-
+    
 def example_og(program_token,instrument,target=None,observing_template=None):
     if target is None or observing_template is None:
         print(f"An observing template and a target needs to be provided for OG creation for program {program_token} on instrument {instrument}")
         sys.exit(0)
-    return {
+    data = {
     'token': f'{program_token}-{random.randint(1000000000, 9999999999)}',
     'og_priority': 'MEDIUM',
     'target_type': 'OBJECT',
@@ -187,7 +187,10 @@ def example_og(program_token,instrument,target=None,observing_template=None):
             },
         },
     }
-    
+
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4)
+    return data
 def delete_target_example(program_token,instrument):
     try:
         target_api = EntityCrudApi(program_token, 'targets')
