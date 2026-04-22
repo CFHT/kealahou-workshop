@@ -415,7 +415,7 @@ def get_program_info_example(idx=0):
     instrument = program['time_allocation'][0]['instrument']
     return program,progid,instrument
 
-def set_og_example(program_token,instrument):
+def set_og_example(program_token,instrument,target):
     new_og = example_og(program_token,instrument,target=None,observing_template=None)
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
         'observing_group': new_og,
