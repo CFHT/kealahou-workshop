@@ -34,6 +34,7 @@ example_list = {
             6: 'Show Observing Groups',
             7: 'Add Observing Groups',
             8: 'Delete Observing Groups',
+            9: 'Show observing templates',
             #4: 'Show All Examples'
         }
 
@@ -170,7 +171,7 @@ def example_moving_target(program_token: str, instrument: INSTRUMENT):
     }
 
 def example_og(program_token,instrument,target=None,observing_template=None):
-    if target or None or observing_template is None:
+    if target is None or observing_template is None:
         print(f"An observing template and a target needs to be provided for OG creation for program {program_token} on instrument {instrument}")
         sys.exit(0)
     return {
@@ -181,7 +182,7 @@ def example_og(program_token,instrument,target=None,observing_template=None):
         'observing_block': {
             'observing_component': [{
                 'target_token': target['token'],
-                'observing_template_token': first_ot['token'],
+                'observing_template_token': observing_template['token'],
                 }],
             },
         },
@@ -281,8 +282,9 @@ def get_program_list_example(output=True):
             print(f"Instrument: {program['program_data']['time_allocation'][0]['instrument']}")
             print(f"Time allocated: {program['program_data']['time_allocation'][0]['time_allocated_millis']/(1000*3600)} hours")        
             print("-" * 80)
-            print(f"API program keys/values:")
+            
             if (verbose):
+                print(f"API program keys/values:")
                 print(f"Program {program['program_data']['token']}: {json.dumps(program['program_data'],indent=4,sort_keys=True)}")
     
         # Print JSON if verbose
@@ -352,7 +354,7 @@ def process_options():
     # Run a list of the examples.
     parser.add_argument('--example', '-e',                    
                     required=False,                    
-                    choices=[1,2,3,4,5,6,7,8],
+                    choices=[1,2,3,4,5,6,7,8,9,10],
                     default=None,
                     type=int,
                     help='Options for specific examples. Choose integer:\n'+
@@ -364,7 +366,8 @@ def process_options():
                           '\t6 - Show Observing Groups\n'+
                           '\t7 - Add Observing Groups\n'+
                           '\t8 - Delete Observing Groups\n'+
-                          '\t9 - Show observing templates\n'
+                          '\t9 - Show observing templates\n'+
+                          '\t10 - Show exposures taken\n'
                           )
     
     # verbose output.
@@ -415,8 +418,9 @@ def get_program_info_example(idx=0):
     instrument = program['time_allocation'][0]['instrument']
     return program,progid,instrument
 
-def set_og_example(program_token,instrument,target):
-    new_og = example_og(program_token,instrument,target=None,observing_template=None)
+def set_og_example(program_token,instrument,target=None,observing_template=None):
+    print(target,observing_template)
+    new_og = example_og(program_token,instrument,target,observing_template)
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
         'observing_group': new_og,
     })
@@ -424,20 +428,22 @@ def set_og_example(program_token,instrument,target):
     print(f"Created observing group OG{og['label']} [token = {og['token']}] for program {program_token} using {instrument}")
     print()
 
-def get_ot_list_example():
+def get_ot_list_example(program_token):
     response = api_request(f'programs/{program_token}/observing-templates')
     print(f'All observing templates for {program_token}:')
     for ot in response['observing_template']:
         print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
     print()
-    first_ot = response['observing_template'][0]  # Save for later example
-
+    first_ot = response['observing_template'][0]
+    
+    return first_ot
+    
 def main():
     process_options()  
     print("#" * 80)  
     print(f"Chosen example: {example_list[example]}")
     print("#" * 80)
-    program,progid,instrument = get_program_info_example(1)
+    program,progid,instrument = get_program_info_example(0)
     match example:
         case 1:
             get_program_list_example()
@@ -452,10 +458,12 @@ def main():
         case 6:
             get_og_list_example(progid,instrument)
         case 7:
-            set_og_example(progid,instrument,get_target_example(-1))
+            set_og_example(progid,instrument,get_target_example(-1),get_ot_list_example(progid))
         case 8:
             pass
         case 9:
+            get_ot_list_example(progid);
+        case 10:
             pass
         #     get_program_list_example()
         #     get_pointing_offset_example()
