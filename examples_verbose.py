@@ -249,7 +249,7 @@ def get_target_list_example():
             if verbose:
                 print("-" * 80)
                 print(f"API target keys/values")
-                print(f"{tresponse['entity']}")
+                print(f"{json.dumps(tresponse['entity'],indent=4, sort_keys=True)}")
         print("#" * 80)
 
     if (vverbose):
@@ -316,6 +316,7 @@ def get_megacam_default_pointing_offset_example():
 
         else:
             print(f"No default pointing offsets for {instrument_name}")
+        
         
         # for offset in offsets:
         #     if ('ra_offset' in offset['offset'] and 'dec_offset' in offset['offset']):
@@ -407,7 +408,7 @@ def get_og_list_example(program_token,instrument):
     ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
     for og in ogs['observing_group']:
         print(f"OG{og['label']}")
-        print(og)
+        print(json.dumps(og,indent=4,sort_keys=True))
         print()
     if verbose or vverbose:
         print(f"Not other information available than the default output.")
@@ -436,7 +437,10 @@ def get_ot_list_example(program_token):
     print(f'All observing templates for {program_token}:')
     for ot in response['observing_template']:
         print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
+        if verbose:
+            print(json.dumps(ot,indent=4,sort_keys=True))
     print()
+    
     first_ot = response['observing_template'][0]
     
     return first_ot
