@@ -409,15 +409,12 @@ def get_og_list_example(program_token,instrument):
     #og_api = EntityCrudApi(program_token,'observing-groups')#This does not work since the api returned does not contain 'entity'.
     ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
     for og in ogs['observing_group']:
-        print(f"OG{og['label']}")
-        print(json.dumps(og, indent=4))
-        print()
+        print(f"OG{og['label']}, OG priority: {og['og_priority']}")
         if verbose or vverbose:
-            print(f"Not other information available than the default output.")
+            print(json.dumps(og, indent=4))
             print()
-    # response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
-    #     'observing_group': new_og,
-
+    return ogs['observing_group']
+    
 def get_program_info_example(idx=0):
     programs = get_program_list_example(output=False)
     program = programs[idx]['program_data']
@@ -469,7 +466,14 @@ def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
     print()
 
 def delete_og_example(program_token,instrument):
-    pass
+    ogs = get_og_list_example(program_token, instrument)
+    og=ogs[-1]
+    try:
+        api_request(f"observing-groups/{og['token']}", method='DELETE')
+        print(f"Deleted observing group OG{og['label']} [token = {og['token']}]")
+    except Exception as e:
+        print(f"Target deletion failed")
+    print()
 
 def main():
     process_options()  
