@@ -456,10 +456,20 @@ def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
     print(f'All exposures for {program_token}:')
     for exp in response['exposure']:
         #print(f"{exp['obsid']} (OG{exp['observing_group_context']['observing_group_label']}, {exp['target']['name']})")
-        print(f"{exp['obsid']} OG{exp['observing_group_context']['observing_group_label']}, {exp['target_data']['name']}")
+        s = (
+            f"Exposure ID: {exp['obsid']} OG{exp['observing_group_context']['observing_group_label']}, "
+            f"Target: {exp['target_data']['name']}, "
+            f"Filter: {exp['exposure_status']['megacam_status']['actual_filter']}, "
+            f"IQ: {exp['exposure_status']['megacam_status']} "
+            #f"IQ: {exp['exposure_status']['megacam_status']['elixir_processing_result']['sky_background']} "
+        )
+        print(s)
         if verbose:
             print(json.dumps(exp,indent=4))
     print()
+
+def delete_og_example(program_token,instrument):
+    pass
 
 def main():
     process_options()  
@@ -483,7 +493,7 @@ def main():
         case 7:
             set_og_example(progid,instrument,get_target_example(progid,instrument,2),get_ot_list_example(progid))
         case 8:
-            pass
+            delete_og_example(progid,instrument)
         case 9:
             get_ot_list_example(progid);
         case 10:
