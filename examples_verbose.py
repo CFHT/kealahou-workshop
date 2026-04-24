@@ -174,6 +174,7 @@ def example_og(program_token,instrument,target=None,observing_template=None):
     if target is None or observing_template is None:
         print(f"An observing template and a target needs to be provided for OG creation for program {program_token} on instrument {instrument}")
         sys.exit(0)
+    print(f"Target {target}")
     data = {
     'token': f'{program_token}-{random.randint(1000000000, 9999999999)}',
     'og_priority': 'MEDIUM',
@@ -222,43 +223,46 @@ def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target
     if verbose or vverbose:
         print(target_api)
 
-def get_target_list_example():
+def get_target_list_example(program_token,instrument):
     """
     Example to get the target list
     """
 
-    print("Displaying Target List")
+    print(f"Displaying Target List for {program_token} using {instrument}")
     print("#" * 80)
     
     response = api_request('programs')
     programs = response['entity']
-    for program in programs:
-        program_token = program['program_data']['token']
-        print(f"Program token {program_token}")
-        try:
-            tresponse = api_request(f'/programs/{program_token}/targets')
-        except Exception as e:
-            print('API request to get list targets failed')
+    #print(f"Program token {program_token}")
+    try:
+        tresponse = api_request(f'/programs/{program_token}/targets')
+    except Exception as e:
+        print('API request to get list targets failed')
+    
+    # for program in programs:
+    #     program_token = program['program_data']['token']
+    #     print(f"Program token {program_token}")
+    #     try:
+    #         tresponse = api_request(f'/programs/{program_token}/targets')
+    #     except Exception as e:
+    #         print('API request to get list targets failed')
             
-        print(f'All targets for {program_token}:')
-        for target in tresponse['entity']:
-            print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
-            if verbose:
-                print("-" * 80)
-                print(f"API target keys/values")
-                print(f"{json.dumps(tresponse['entity'],indent=4, sort_keys=True)}")
-        print("#" * 80)
+    print(f'All targets for {program_token}:')
+    for target in tresponse['entity']:
+        print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
+        if verbose:
+            print("-" * 80)
+            print(f"API target keys/values")
+            print(f"{json.dumps(tresponse['entity'],indent=4, sort_keys=True)}")
+    print("#" * 80)
 
     if (vverbose):
         print(f"Response: {json.dumps(response, indent=4, sort_keys=True)}")    
 
     return tresponse['entity']
-def get_target_example(idx=0):
-    if idx == -1:
-        print(f"Getting last target")
-    else:
-        print(f"Getting target number {idx}")
-    return get_target_list_example()[idx]
+
+def get_target_example(program_token,instrument,idx=0):
+    return get_target_list_example(program_token, instrument)[idx]
 
 def get_program_list_example(output=True):
     """
@@ -421,7 +425,7 @@ def get_program_info_example(idx=0):
     return program,progid,instrument
 
 def set_og_example(program_token,instrument,target=None,observing_template=None):
-    print(target,observing_template)
+    #print(target,observing_template)
     new_og = example_og(program_token,instrument,target,observing_template)
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
         'observing_group': new_og,
@@ -439,9 +443,9 @@ def get_ot_list_example(program_token):
             print(json.dumps(ot,indent=4,sort_keys=True))
     print()
     
-    first_ot = response['observing_template'][0]
+    ot_out = response['observing_template'][0]
     
-    return first_ot
+    return ot_out
     
 def main():
     process_options()  
@@ -455,7 +459,7 @@ def main():
         case 2:
             get_megacam_default_pointing_offset_example()
         case 3:
-            get_target_list_example()
+            get_target_list_example(progid,instrument)
         case 4:
             set_target_example(progid,instrument,moving_target=False)
         case 5:
@@ -463,7 +467,7 @@ def main():
         case 6:
             get_og_list_example(progid,instrument)
         case 7:
-            set_og_example(progid,instrument,get_target_example(-1),get_ot_list_example(progid))
+            set_og_example(progid,instrument,get_target_example(progid,instrument,2),get_ot_list_example(progid))
         case 8:
             pass
         case 9:
