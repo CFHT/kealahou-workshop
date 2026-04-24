@@ -3,3 +3,5 @@
 - Added target writing. Given also an example of how to add the magnitude on moving and fixed targets.
 - Renamed pointing offsets example to get_megacam_default_pointing_offset_example.
 - In the target API, the magnitude is B instead of AB.
+- When listing exposures, "elixir_processing_results" is not always there. Is this normal or just because they are testing exposures?
+- 
