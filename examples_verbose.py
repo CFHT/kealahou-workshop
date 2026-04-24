@@ -187,9 +187,6 @@ def example_og(program_token,instrument,target=None,observing_template=None):
             },
         },
     }
-
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4)
     return data
 def delete_target_example(program_token,instrument):
     try:
@@ -408,10 +405,11 @@ def get_og_list_example(program_token,instrument):
     ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
     for og in ogs['observing_group']:
         print(f"OG{og['label']}")
-        print(json.dumps(og,indent=4,sort_keys=True))
+        print(json.dumps(og, indent=4))
         print()
-    if verbose or vverbose:
-        print(f"Not other information available than the default output.")
+        if verbose or vverbose:
+            print(f"Not other information available than the default output.")
+            print()
     # response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
     #     'observing_group': new_og,
 
