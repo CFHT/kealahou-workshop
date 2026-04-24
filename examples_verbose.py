@@ -35,6 +35,7 @@ example_list = {
             7: 'Add Observing Groups',
             8: 'Delete Observing Groups',
             9: 'Show observing templates',
+            10: 'Show exposures taken'
             #4: 'Show All Examples'
         }
 
@@ -446,10 +447,23 @@ def get_ot_list_example(program_token):
     ot_out = response['observing_template'][0]
     
     return ot_out
-    
+
+def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
+    """
+    Example to get the list of exposures
+    """
+    response = api_request(f'/programs/{program_token}/exposures')
+    print(f'All exposures for {program_token}:')
+    for exp in response['exposure']:
+        #print(f"{exp['obsid']} (OG{exp['observing_group_context']['observing_group_label']}, {exp['target']['name']})")
+        print(f"{exp['obsid']} OG{exp['observing_group_context']['observing_group_label']}, {exp['target_data']['name']}")
+        if verbose:
+            print(json.dumps(exp,indent=4))
+    print()
+
 def main():
     process_options()  
-    print("#" * 80)  
+    print("#" * 80)
     print(f"Chosen example: {example_list[example]}")
     print("#" * 80)
     program,progid,instrument = get_program_info_example(0)
@@ -473,7 +487,7 @@ def main():
         case 9:
             get_ot_list_example(progid);
         case 10:
-            pass
+            get_exposure_list_example(progid,instrument)
         #     get_program_list_example()
         #     get_pointing_offset_example()
         #     get_target_list_example()
