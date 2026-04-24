@@ -2,4 +2,3 @@
 .DS_STORE
 src/__pycache__
 *checkpoints*
-Notes.md
