@@ -502,9 +502,6 @@ def main():
             get_ot_list_example(progid);
         case 10:
             get_exposure_list_example(progid,instrument)
-        #     get_program_list_example()
-        #     get_pointing_offset_example()
-        #     get_target_list_example()
         case _:
             print(f"Unkown Option: {example}.")
     
