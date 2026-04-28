@@ -195,6 +195,7 @@ def delete_target_example(program_token,instrument):
         target_api = EntityCrudApi(program_token, 'targets')
     except Exception as e:
         print(f"Problem getting target_api from {program_token} on {instrument} - {e}")
+        
     deleted_target = target_api.list()[-1]
     print(f"Deleting {deleted_target['name']},{deleted_target['token']}")
     
@@ -210,12 +211,13 @@ def delete_target_example(program_token,instrument):
             print()
     
 def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target=False):
-    target_api = EntityCrudApi(program_token, 'targets')
+        
     if moving_target:
         new_target = example_moving_target(program_token, instrument)
     else:
         new_target = example_fixed_target(program_token, instrument)
     try:
+        target_api = EntityCrudApi(program_token, 'targets')
         target_api.create_or_update(new_target)
         print(f"Target created for {program_token} using {instrument}.")
     except Exception as e:
@@ -231,14 +233,14 @@ def get_target_list_example(program_token,instrument):
 
     print(f"Displaying Target List for {program_token} using {instrument}")
     print("#" * 80)
-    
-    response = api_request('programs')
-    programs = response['entity']
-    #print(f"Program token {program_token}")
+
     try:
+        response = api_request('programs')
+        programs = response['entity']
+        #print(f"Program token {program_token}")
         tresponse = api_request(f'/programs/{program_token}/targets')
     except Exception as e:
-        print('API request to get list targets failed')
+        print(f"API request to get list targets failed: {e}")
     
     # for program in programs:
     #     program_token = program['program_data']['token']
@@ -318,17 +320,6 @@ def get_megacam_default_pointing_offset_example():
 
         else:
             print(f"No default pointing offsets for {instrument_name}")
-        
-        
-        # for offset in offsets:
-        #     if ('ra_offset' in offset['offset'] and 'dec_offset' in offset['offset']):
-        #         print(f"Offset: RA offset: {offset['offset']['ra_offset']} DEC offset: {offset['offset']['dec_offset']}")
-        #         #print("#" * 80)
-        #         if (vverbose or verbose):
-        #             print("-" * 80)
-        #             print(f"API MegaCam offset keys/values")
-        #             print(offset)
-        #             #print(json.dumps(response, indent=4, sort_keys=True))
 
 def process_options():
     """
@@ -407,7 +398,11 @@ def process_options():
 
 def get_og_list_example(program_token,instrument):
     #og_api = EntityCrudApi(program_token,'observing-groups')#This does not work since the api returned does not contain 'entity'.
-    ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
+    try:
+        ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
+    except Exception as e:
+        print(f"Getting OGs failed: {e}")
+        
     for og in ogs['observing_group']:
         print(f"OG{og['label']}, OG priority: {og['og_priority']}")
         if verbose or vverbose:
