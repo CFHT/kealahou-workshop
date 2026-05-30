@@ -126,8 +126,90 @@ class EntityCrudApi:
     def delete(self, entity_token: str):
         api_request(f'{self.path_prefix}/{entity_token}', method='DELETE')    
 
+def process_options():
+    """
+        Assigns optional arguments when running the script.
+
+        Parameters: None.
+        Returns: Nothing.
+    """
+    global access_token, verbose, vverbose, api_url, example
+
+    parser = argparse.ArgumentParser(description="This script shows examples of using the Kealahou API for PI program management.",
+                                     formatter_class=argparse.RawTextHelpFormatter)
+
+    
+    # Check for token file.
+    parser.add_argument('--token_file', '-t',
+                    required=False,
+                    type=str,
+                    default=KEY_FILE,
+                    help=f"The path to the file that contains a user access token (default ./{KEY_FILE})")
+    
+    # Ability to change api urls
+    parser.add_argument('--api_url', '-a',
+                    required=False,
+                    type=str.lower,
+                    default=BASE_URL,
+                    help=f"The path to the file that contains a user access token (default {BASE_URL}).")
+    
+    # Run a list of the examples.
+    parser.add_argument('--example', '-e',                    
+                    required=False,                    
+                    choices=[1,2,3,4,5,6,7,8,9,10],
+                    default=None,
+                    type=int,
+                    help='Options for specific examples. Choose integer:\n'+
+                          '\t1 - List Programs \n'+
+                          '\t2 - List default MegaCam Pointing Offsets \n'+
+                          '\t3 - Show Targets \n'+
+                          '\t4 - Add a new targets\n'+
+                          '\t5 - Delete a target\n'+
+                          '\t6 - Show Observing Groups\n'+
+                          '\t7 - Add Observing Groups\n'+
+                          '\t8 - Delete Observing Groups\n'+
+                          '\t9 - Show observing templates\n'+
+                          '\t10 - Show exposures taken\n'
+                          )
+    
+    # verbose output.
+    parser.add_argument('--verbose', '-v',
+                    action='store_true',
+                    help='Enable verbose output. This will print out JSON attributes for each particular example.')
+
+    parser.add_argument('--vverbose', '-vv',
+                    action='store_true',
+                    help='Enable enhanced verbose output. This will print out JSON attributes of the entire response.')    
+
+    args = parser.parse_args()
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+    
+    # Load access token
+    try:
+        with open(args.token_file, 'r') as file_read:
+            access_token = file_read.read().strip()
+    except OSError:
+        print(f"Failed to load API access token file: {args.token_file}. Check path and file permissions.")
+        exit(1)
+
+    verbose = args.verbose
+    vverbose = args.vverbose
+    api_url = args.api_url
+    example = args.example
+
 def example_fixed_target(program_token: str, instrument: INSTRUMENT):
-    #Get a single target:
+    """
+    Obtain a single Fixed Target based on the Program Token
+    
+    Parameters:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+
+    Returns: Formatted json to be used in an API call for a single fixed target.
+    """
     
     return {
         'token': f'{program_token}-{random.randint(1000000000, 9999999999)}',
@@ -228,41 +310,39 @@ def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target
 
 def get_target_list_example(program_token,instrument):
     """
-    Example to get the target list
+    Prints a target list from a single program.
+
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+
+    Returns: json Target response entity.
     """
 
     print(f"Displaying Target List for {program_token} using {instrument}")
     print("#" * 80)
 
     try:
-        response = api_request('programs')
+        response = api_request('programs')        
         programs = response['entity']
-        #print(f"Program token {program_token}")
-        tresponse = api_request(f'/programs/{program_token}/targets')
+        print(f"Program token {program_token}")
+        target_response = api_request(f'/programs/{program_token}/targets')
     except Exception as e:
         print(f"API request to get list targets failed: {e}")
-    
-    # for program in programs:
-    #     program_token = program['program_data']['token']
-    #     print(f"Program token {program_token}")
-    #     try:
-    #         tresponse = api_request(f'/programs/{program_token}/targets')
-    #     except Exception as e:
-    #         print('API request to get list targets failed')
-            
+                
     print(f'All targets for {program_token}:')
-    for target in tresponse['entity']:
+    for target in target_response['entity']:
         print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
         if verbose:
             print("-" * 80)
             print(f"API target keys/values")
-            print(f"{json.dumps(tresponse['entity'],indent=4, sort_keys=True)}")
+            print(f"{json.dumps(target_response['entity'],indent=4, sort_keys=True)}")
     print("#" * 80)
 
     if (vverbose):
         print(f"Response: {json.dumps(response, indent=4, sort_keys=True)}")    
 
-    return tresponse['entity']
+    return target_response['entity']
 
 def get_target_example(program_token,instrument,idx=0):
     return get_target_list_example(program_token, instrument)[idx]
@@ -272,6 +352,8 @@ def get_program_list_example(output=True):
     Simple API example to list programs
 
     Prints or return JSON attributes
+
+    Params: output - Boolean True prints out program info.
     """
     response = api_request('programs')
     programs = response['entity']
@@ -281,7 +363,6 @@ def get_program_list_example(output=True):
         print("#" * 80)
 
         # List programs
-
         for program in programs:
             print("#" * 80)
             print(f"Title: {program['program_data']['title']}")
@@ -321,83 +402,13 @@ def get_megacam_default_pointing_offset_example():
         else:
             print(f"No default pointing offsets for {instrument_name}")
 
-def process_options():
+def get_og_list_example(program_token: str):
     """
-        Assigns optional arguments when running the script.
+    Params:
+        program_token: str The token of the select program.   
 
-        Parameters: None.
-        Returns: Nothing.
+        returns: JSON of observing group results     
     """
-    global access_token, verbose, vverbose, api_url, example
-
-    parser = argparse.ArgumentParser(description="This script shows examples of using the Kealahou API for PI program management.",
-                                     formatter_class=argparse.RawTextHelpFormatter)
-
-    
-    # Check for token file.
-    parser.add_argument('--token_file', '-t',
-                    required=False,
-                    type=str,
-                    default=KEY_FILE,
-                    help=f"The path to the file that contains a user access token (default ./{KEY_FILE})")
-    
-    # Ability to change api urls
-    parser.add_argument('--api_url', '-a',
-                    required=False,
-                    type=str.lower,
-                    default=BASE_URL,
-                    help=f"The path to the file that contains a user access token (default {BASE_URL}).")
-    
-    # Run a list of the examples.
-    parser.add_argument('--example', '-e',                    
-                    required=False,                    
-                    choices=[1,2,3,4,5,6,7,8,9,10],
-                    default=None,
-                    type=int,
-                    help='Options for specific examples. Choose integer:\n'+
-                          '\t1 - List Programs \n'+
-                          '\t2 - List default MegaCam Pointing Offsets \n'+
-                          '\t3 - Show Targets \n'+
-                          '\t4 - Add a new targets\n'+
-                          '\t5 - Delete a target\n'+
-                          '\t6 - Show Observing Groups\n'+
-                          '\t7 - Add Observing Groups\n'+
-                          '\t8 - Delete Observing Groups\n'+
-                          '\t9 - Show observing templates\n'+
-                          '\t10 - Show exposures taken\n'
-                          )
-    
-    # verbose output.
-    parser.add_argument('--verbose', '-v',
-                    action='store_true',
-                    help='Enable verbose output. This will print out JSON attributes for each particular example.')
-
-    parser.add_argument('--vverbose', '-vv',
-                    action='store_true',
-                    help='Enable enhanced verbose output. This will print out JSON attributes of the entire response.')    
-
-    args = parser.parse_args()
-
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(0)
-    
-    # Load access token
-    try:
-        with open(args.token_file, 'r') as file_read:
-            access_token = file_read.read().strip()
-    except OSError:
-        print(f"Failed to load API access token file: {args.token_file}. Check path and file permissions.")
-        exit(1)
-
-    verbose = args.verbose
-    vverbose = args.vverbose
-    api_url = args.api_url
-    example = args.example
-
-
-def get_og_list_example(program_token,instrument):
-    #og_api = EntityCrudApi(program_token,'observing-groups')#This does not work since the api returned does not contain 'entity'.
     try:
         ogs = api_request(f"programs/{program_token}/observing-groups", method='GET')
     except Exception as e:
@@ -410,24 +421,56 @@ def get_og_list_example(program_token,instrument):
             print()
     return ogs['observing_group']
     
-def get_program_info_example(idx=0):
+def get_first_program_example(idx=0):
+    """
+    Grabs program information based on the index number
+    and returns it as separate variables.
+
+    Returns:     
+        program_id - The program identification 
+        instrument - The name of the instrument (see constant).
+    """
+
+
     programs = get_program_list_example(output=False)
-    program = programs[idx]['program_data']
-    progid = program['token']
-    instrument = program['time_allocation'][0]['instrument']
-    return program,progid,instrument
+    program_id,instrument = None, None
+        
+    if (len(programs) > 0):
+        program = programs[idx]['program_data']
+        program_id = program['token']
+        instrument = program['time_allocation'][0]['instrument']
+    
+    return program_id,instrument
 
 def set_og_example(program_token,instrument,target=None,observing_template=None):
-    #print(target,observing_template)
+    """
+    Creates a Observing Group via API put call based on given parameters.
+    Prints the response
+
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+        target: str
+        observing_template: JSON str
+
+    Returns:
+        nothing.
+    """
     new_og = example_og(program_token,instrument,target,observing_template)
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
         'observing_group': new_og,
     })
     og = response['observing_group']
-    print(f"Created observing group OG{og['label']} [token = {og['token']}] for program {program_token} using {instrument}")
-    print()
+    print(f"Created observing group OG{og['label']} [token = {og['token']}] for program {program_token} using {instrument}")    
 
 def get_ot_list_example(program_token):
+    """
+    API call prints Observing Templates based 
+    Params:
+        program_token: str The token of the select program.        
+    Returns:
+        Nothing
+    """
     response = api_request(f'programs/{program_token}/observing-templates')
     print(f'All observing templates for {program_token}:')
     for ot in response['observing_template']:
@@ -442,7 +485,13 @@ def get_ot_list_example(program_token):
 
 def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
     """
-    Example to get the list of exposures
+    Example API call to get the list of exposures
+
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+    Returns:
+        Nothing
     """
     response = api_request(f'/programs/{program_token}/exposures')
     print(f'All exposures for {program_token}:')
@@ -461,7 +510,14 @@ def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
     print()
 
 def delete_og_example(program_token,instrument):
-    ogs = get_og_list_example(program_token, instrument)
+    """
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+    Returns:
+        Nothing
+    """
+    ogs = get_og_list_example(program_token)
     og=ogs[-1]
     try:
         api_request(f"observing-groups/{og['token']}", method='DELETE')
@@ -475,28 +531,37 @@ def main():
     print("#" * 80)
     print(f"Chosen example: {example_list[example]}")
     print("#" * 80)
-    program,progid,instrument = get_program_info_example(0)
+
+    # Used examples higher than 1: Get Program List.
+    program_id,instrument = get_first_program_example(0)    
+
+    # Exit if there is no programs to conduct furether examples.
+    if (example > 2 and program_id == None):
+        print(f"No Programs found. Cannot execute example: {example_list[example]}")
+        exit(0)
+    
+    # Execute API call based on option chosen.
     match example:
         case 1:
             get_program_list_example()
         case 2:
             get_megacam_default_pointing_offset_example()
         case 3:
-            get_target_list_example(progid,instrument)
+            get_target_list_example(program_id,instrument)
         case 4:
-            set_target_example(progid,instrument,moving_target=False)
+            set_target_example(program_id,instrument,moving_target=False)
         case 5:
-            delete_target_example(progid,instrument)
+            delete_target_example(program_id,instrument)
         case 6:
-            get_og_list_example(progid,instrument)
+            get_og_list_example(program_id)
         case 7:
-            set_og_example(progid,instrument,get_target_example(progid,instrument,2),get_ot_list_example(progid))
+            set_og_example(program_id,instrument,get_target_example(program_id,instrument,2),get_ot_list_example(program_id))
         case 8:
-            delete_og_example(progid,instrument)
+            delete_og_example(program_id,instrument)
         case 9:
-            get_ot_list_example(progid);
+            get_ot_list_example(program_id);
         case 10:
-            get_exposure_list_example(progid,instrument)
+            get_exposure_list_example(program_id,instrument)
         case _:
             print(f"Unkown Option: {example}.")
     
