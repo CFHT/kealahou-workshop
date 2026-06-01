@@ -272,7 +272,43 @@ def example_og(program_token,instrument,target=None,observing_template=None):
         },
     }
     return data
+
+def delete_target(program_token, target_name, target_token):
+    """
+
+    Deletes the latest based on the token token and name.
+    
+    Params:
+        program_token: str The token of the select program.
+        target_name: Given name of the target.
+        target_token: Given token of the target.
+    Returns:
+        Nothing
+    """
+    try:
+        target_api = EntityCrudApi(program_token, 'targets')
+    except Exception as e:
+        print(f"Problem getting target_api from {program_token} - {e}")
+        
+    try:
+        target_api.delete(target_token)
+        print(f"Target {target_name} deleted")
+    except Exception as e:
+        print(f"Problem deleting {target_name} - {e}")
+    
+            
 def delete_target_example(program_token,instrument):
+    """
+
+    Deletes the latest target based on the program id.
+    The target id and name is passed for deletion.
+
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+    Returns:
+        Nothing
+    """
     try:
         target_api = EntityCrudApi(program_token, 'targets')
     except Exception as e:
@@ -281,11 +317,8 @@ def delete_target_example(program_token,instrument):
     deleted_target = target_api.list()[-1]
     print(f"Deleting {deleted_target['name']},{deleted_target['token']}")
     
-    try:
-        target_api.delete(deleted_target['token'])
-        print(f"Target {deleted_target['name']} deleted")
-    except Exception as e:
-        print(f"Problem deleting {deleted_target} from {program_token} on {instrument} - {e}")
+    delete_target(program_token,deleted_target['name'],deleted_target['token'] )
+    
     if verbose or vverbose:
         for i,target in enumerate(target_api.list()):
             print(f"Target {i}")
@@ -293,7 +326,19 @@ def delete_target_example(program_token,instrument):
             print()
     
 def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target=False):
-        
+    """
+
+    Creates a target based on the program token and instrument.  Also type of targe
+    fixed or moving taget.
+
+    Params:
+        program_token: str The token of the select program.
+        instrument: A constant string (i.e., MEGACAM).
+        moving_target: Boolean. True creates moving. False is fixexd.
+    Returns:
+        Nothing
+    """
+
     if moving_target:
         new_target = example_moving_target(program_token, instrument)
     else:
@@ -301,7 +346,7 @@ def set_target_example(program_token: str, instrument: INSTRUMENT, moving_target
     try:
         target_api = EntityCrudApi(program_token, 'targets')
         target_api.create_or_update(new_target)
-        print(f"Target created for {program_token} using {instrument}.")
+        print(f"Target created for Program ID: {program_token} using {instrument}.")
     except Exception as e:
         print(f"Problem adding new target to {program_token} on {instrument} - {e}.")
 
@@ -319,22 +364,20 @@ def get_target_list_example(program_token,instrument):
     Returns: json Target response entity.
     """
 
-    print(f"Displaying Target List for {program_token} using {instrument}")
-    print("#" * 80)
+    print(f"Attempting to display Target List for Program ID: {program_token} with {instrument}")    
 
     try:
         response = api_request('programs')        
-        programs = response['entity']
-        print(f"Program token {program_token}")
+        programs = response['entity']        
         target_response = api_request(f'/programs/{program_token}/targets')
     except Exception as e:
         print(f"API request to get list targets failed: {e}")
+        exit()
                 
     print(f'All targets for {program_token}:')
     for target in target_response['entity']:
         print(f"T{target['label']} - {target['name']} [token = {target['token']}]")
-        if verbose:
-            print("-" * 80)
+        if verbose:            
             print(f"API target keys/values")
             print(f"{json.dumps(target_response['entity'],indent=4, sort_keys=True)}")
     print("#" * 80)
@@ -383,24 +426,23 @@ def get_program_list_example(output=True):
         
 def get_megacam_default_pointing_offset_example():
     """
-    Simple API example to list offsets for each instrument
+    Simple API example to list pointing offsets for MEGACAM
 
     Prints JSON attributes
     """
-    global INSTRUMENT
+    intrument = 'MEGACAM'
+    response = api_request('pointing_offset', data={                
+            'instrument': intrument
+            })
+    
+    offsets = response['entity']
 
-    for instrument_name in get_args(INSTRUMENT):
-        response = api_request('pointing_offset', data={                
-                'instrument': instrument_name
-                })
-        
-        if (instrument_name) == 'MEGACAM':
-            offsets = response['entity']
-            for offset in offsets:
-                print(offset)
-
-        else:
-            print(f"No default pointing offsets for {instrument_name}")
+    if (offsets):
+        print(f"Pointing Offsets for {intrument} below:")
+        for offset in offsets:
+            print(offset)
+    else:
+        print(f"No default pointing offsets found.")
 
 def get_og_list_example(program_token: str):
     """
@@ -549,7 +591,7 @@ def main():
         case 3:
             get_target_list_example(program_id,instrument)
         case 4:
-            set_target_example(program_id,instrument,moving_target=False)
+            set_target_example(program_id,instrument,moving_target=True)
         case 5:
             delete_target_example(program_id,instrument)
         case 6:
