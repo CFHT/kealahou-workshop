@@ -35,11 +35,6 @@ The CFHT/Kealahou development team can be contacted at <kealahou-api@cfht.hawaii
 
 Kealahou has both a Production environment and a Staging (Test) environment. For the purposes of AEON integration with the Kealahou API, both environments are identical, however to prevent any potential impact to the Production environment, only the details for the Staging environment are provided in this document. **When the time comes for the final integration with the Production environment, contact the CFHT/Kealahou development staff.** Additionally, user and program data on the Staging environment should not be considered persistent. 
 
-#### Phase 1 Observing Template Disclaimer
-In preparation for the next phase (Phase 2), the Swagger documentation includes the full API definitions for the Observing Templates. **These are subject to change.** As the current release only supports querying (GET) of existing templates, only these specific endpoints have been finalized. All other functionalities should be considered preliminary. Please contact the CFHT/Kealahou development team if any use of these functionalities are required. 
-
-Additionally, the API remains under general development and should be considered a preview version subject to change, except where explicitly noted.
-
 ### Kealahou Staging (Test) Environment
 
 Web UI URL: **https://hou-stage.cfht.hawaii.edu**
@@ -89,6 +84,33 @@ The examples in this project will assume this token has been saved into a file i
 A Swagger API documentation site with the completed API endpoints is available at: https://swagger-stage.cfht.hawaii.edu/
 
 The original [proto files](proto) can also be viewed for a more direct view of documentation for each field.
+
+#### Phase 1 Observing Template Disclaimer
+In preparation for the next phase (Phase 2), the Swagger documentation includes the full API definitions for the Observing Templates. **These are subject to change.** As the current release only supports querying (GET) of existing templates, only these specific endpoints have been finalized. All other functionalities should be considered preliminary. Please contact the CFHT/Kealahou development team if any use of these functionalities are required. 
+
+An example for of how to query the existing Observing Templates is below:
+
+```
+import json
+from urllib.request import Request, urlopen
+
+access_token = 'abc123' #set your security access token
+headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json',
+    }
+program_token = '24B123' # Add a Program id
+
+# Make API call  to obtain observing-templates
+url = f"https://api-stage.cfht.hawaii.edu/programs/{program_token}/observing-templates"
+request = Request(url, None, headers, method='GET')
+response = json.loads(urlopen(request).read().decode('utf-8'))
+for ot in response['observing_template']:
+    print(f"OT{ot['label']} - {ot['name']}")
+    
+``` 
+
+Additionally, the API remains under general development and should be considered a preview version subject to change, except where explicitly noted.
 
 ### API Usage Examples
 
