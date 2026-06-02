@@ -537,8 +537,7 @@ def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
     """
     response = api_request(f'/programs/{program_token}/exposures')
     print(f'All exposures for {program_token}:')
-    for exp in response['exposure']:
-        #print(f"{exp['obsid']} (OG{exp['observing_group_context']['observing_group_label']}, {exp['target']['name']})")
+    for exp in response['exposure']:        
         s = (
             f"Exposure ID: {exp['obsid']} OG{exp['observing_group_context']['observing_group_label']}, "
             f"Target: {exp['target_data']['name']}, "
