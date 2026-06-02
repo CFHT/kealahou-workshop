@@ -1,20 +1,19 @@
 # Kealahou API Workshop
 
-The first release of the Kealahou API for integration with the AEON platform consists of the following capabilities: 
+The first release (March 2026) of the Kealahou API for integration with the AEON platform consists of the following capabilities: 
 
 * Creation of API access tokens. 
 * Querying of a user’s program metadata 
 * Creation of a target entity from broker data or manual parameter input.
 * Submission of fixed target and moving target data to a user’s program.
 
-The second release, which is expected in the next month, will include the following capabilities:
+The second release (June 2026) of the Kealahou API consists of the following capabilities: 
 
 * Querying of a user’s program’s configured Observing Templates. 
 * Creation of Observing Groups, including observation timing information such as observation windows and monitoring parameters.
 * Submission of Observing Group data to a user’s program.
 
-Together these releases constitute the **Phase 1** capability of AEON-CFHT integration. **Phase 2** will add support for the creation and submission of Observing Templates. **Phase 3** will add support for Rapid Target of Opportunity (rToO) observations.
-
+Together these two releases constitute the **Phase 1** capability of AEON-CFHT integration. **Phase 2** will add support for the creation and submission of Observing Templates. **Phase 3** will add support for Rapid Target of Opportunity (rToO) observations, and live observatory status reports.
 
 ### Glossary
 
@@ -35,6 +34,11 @@ The CFHT/Kealahou development team can be contacted at <kealahou-api@cfht.hawaii
 ## Kealahou Development Details
 
 Kealahou has both a Production environment and a Staging (Test) environment. For the purposes of AEON integration with the Kealahou API, both environments are identical, however to prevent any potential impact to the Production environment, only the details for the Staging environment are provided in this document. **When the time comes for the final integration with the Production environment, contact the CFHT/Kealahou development staff.** Additionally, user and program data on the Staging environment should not be considered persistent. 
+
+#### Phase 1 Observing Template Disclaimer
+In preparation for the next phase (Phase 2), the Swagger documentation includes the full API definitions for the Observing Templates. **These are subject to change.** As the current release only supports querying (GET) of existing templates, only these specific endpoints have been finalized. All other functionalities should be considered preliminary. Please contact the CFHT/Kealahou development team if any use of these functionalities are required. 
+
+Additionally, the API remains under general development and should be considered a preview version subject to change, except where explicitly noted.
 
 ### Kealahou Staging (Test) Environment
 
@@ -72,7 +76,7 @@ Note that the token will only be visible to you when you first generate it, so m
 
 The examples in this project will assume this token has been saved into a file in this directory named `.access_token`.
 
-### Planned End-User Workflow (Phase 1)
+### Expected End-User Workflow (Phase 1)
 
 1. A user is granted time on CFHT through the standard CFHT TAC process, or through DDT.
 2. The user creates an API access token, unless they have an existing one.
@@ -86,10 +90,6 @@ A Swagger API documentation site with the completed API endpoints is available a
 
 The original [proto files](proto) can also be viewed for a more direct view of documentation for each field.
 
-**Disclaimer** 
-The API is undergoing ongoing cleanup and improvements.
-This should be considered a preview version subject to change, except where explicitly noted.
-
 ### API Usage Examples
 
 To run these examples yourself, make sure to set up an access token first, as described [above](#Access-Token).
@@ -99,9 +99,9 @@ There are some brief examples of accessing the API using cURL in [curl_examples.
 For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py).
 This script should work with Python 3.10 or newer.
 
-### Code Example
+### Python Code Example
 
-```
+`
 import json
 from urllib.request import Request, urlopen
 
@@ -119,4 +119,8 @@ response = json.loads(urlopen(request).read().decode('utf-8'))
 for ot in response['observing_template']:
     print(f"OT{ot['label']} - {ot['name']}")
     
-``` 
+`
+
+For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py) and [examples_verbose.py](examples_verbose.py). The latter provides expanded Python functionalities.
+These scripts should work with Python 3.10 or newer.
+
