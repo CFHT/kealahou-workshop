@@ -101,7 +101,7 @@ This script should work with Python 3.10 or newer.
 
 ### Python Code Example
 
-`
+```
 import json
 from urllib.request import Request, urlopen
 
@@ -119,7 +119,7 @@ response = json.loads(urlopen(request).read().decode('utf-8'))
 for ot in response['observing_template']:
     print(f"OT{ot['label']} - {ot['name']}")
     
-`
+```
 
 For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py) and [examples_verbose.py](examples_verbose.py). The latter provides expanded Python functionalities.
 These scripts should work with Python 3.10 or newer.
