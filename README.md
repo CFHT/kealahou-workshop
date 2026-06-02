@@ -121,28 +121,6 @@ There are some brief examples of accessing the API using cURL in [curl_examples.
 For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py).
 This script should work with Python 3.10 or newer.
 
-### Python Code Example
-
-```
-import json
-from urllib.request import Request, urlopen
-
-access_token = 'abc123' #set your security access token
-headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json',
-    }
-program_token = '24B123' # Add a Program id
-
-# Make API call  to obtain observing-templates
-url = f"https://api-stage.cfht.hawaii.edu/programs/{program_token}/observing-templates"
-request = Request(url, None, headers, method='GET')
-response = json.loads(urlopen(request).read().decode('utf-8'))
-for ot in response['observing_template']:
-    print(f"OT{ot['label']} - {ot['name']}")
-    
-```
-
 For a more thorough example of walking through the steps of using the API, in Python, see [example.py](example.py) and [examples_verbose.py](examples_verbose.py). The latter provides expanded Python functionalities.
 These scripts should work with Python 3.10 or newer.
 
