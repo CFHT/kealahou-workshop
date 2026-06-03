@@ -456,12 +456,12 @@ def get_og_list_example(program_token: str):
     except Exception as e:
         print(f"Getting OGs failed: {e}")
         
-    for og in ogs['observing_group']:
+    for og in ogs['entity']:
         print(f"OG{og['label']}, OG priority: {og['og_priority']}")
         if verbose or vverbose:
             print(json.dumps(og, indent=4))
             print()
-    return ogs['observing_group']
+    return ogs['entity']
     
 def get_first_program_example(idx=0):
     """
@@ -500,9 +500,9 @@ def set_og_example(program_token,instrument,target=None,observing_template=None)
     """
     new_og = example_og(program_token,instrument,target,observing_template)
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
-        'observing_group': new_og,
+        'entity': new_og,
     })
-    og = response['observing_group']
+    og = response['entity']
     print(f"Created observing group OG{og['label']} [token = {og['token']}] for program {program_token} using {instrument}")    
 
 def get_ot_list_example(program_token):
@@ -515,13 +515,13 @@ def get_ot_list_example(program_token):
     """
     response = api_request(f'programs/{program_token}/observing-templates')
     print(f'All observing templates for {program_token}:')
-    for ot in response['observing_template']:
+    for ot in response['entity']:
         print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
         if verbose:
             print(json.dumps(ot,indent=4,sort_keys=True))
     print()
     
-    ot_out = response['observing_template'][0]
+    ot_out = response['entity'][0]
     
     return ot_out
 
