@@ -124,7 +124,7 @@ message AddSingleToSnrBlockResponse {
     cfhtapi.observing.persistence.ObservingGroupData observing_group = 4;
 }
 
-service ObservingGroupServiceProto {
+service ObservingGroupService {
     rpc CreateOrUpdateObservingGroup (ObservingGroupUpdateRequest) returns (ObservingGroupUpdateResponse) {
         option (google.api.http) = {
             put: "/programs/{runid}/observing-groups/{token}"
