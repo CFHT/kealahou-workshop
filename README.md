@@ -86,7 +86,13 @@ A Swagger API documentation site with the completed API endpoints is available a
 The original [proto files](proto) can also be viewed for a more direct view of documentation for each field.
 
 #### Phase 1 Observing Template Disclaimer
-In preparation for the next phase (Phase 2), the Swagger documentation includes the full API definitions for the Observing Templates. **These are subject to change.** As the current release only supports querying (GET) of existing templates, only these specific endpoints have been finalized. All other functionalities should be considered preliminary. Please contact the CFHT/Kealahou development team if any use of these functionalities are required. 
+
+In preparation for the next phase (Phase 2), the Swagger documentation includes full API definitions for Observing Templates.
+**These are subject to change.** The current release only supports fetching (GET) existing templates.
+In particular, only the `token`, `label`, and `name` fields on the data should be expected to remain as-is going forward.
+All other fields and functionalities should be considered preliminary.
+
+Please contact the CFHT/Kealahou development team if any use of these functionalities is needed.
 
 An example for of how to query the existing Observing Templates is below:
 
@@ -96,9 +102,9 @@ from urllib.request import Request, urlopen
 
 access_token = 'abc123' #set your security access token
 headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Content-Type': 'application/json',
-    }
+    'Authorization': f'Bearer {access_token}',
+    'Content-Type': 'application/json',
+}
 program_token = '24B123' # Add a Program id
 
 # Make API call  to obtain observing-templates
