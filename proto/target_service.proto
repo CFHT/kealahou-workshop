@@ -17,21 +17,24 @@ import "google/protobuf/wrappers.proto";
 import "protoc_gen_openapiv2/options/annotations.proto";
 
 message TargetUpdateRequest {
-    // Unique identifier for your science program.
+    // Unique identifier of the science program.
     string runid = 1;
 
     // Target data to be created or updated.
     cfhtapi.observing.persistence.TargetData entity = 2;
 
     /* Unique identifier of the target. If a target with this token already
-     * exists, it will be updated, otherwise it will be created. */
+     * exists, it will be updated, otherwise it will be created.
+     *
+     * Must begin with the program token followed by a dash, e.g.
+     * 20AE01-0123456789 */
     string token = 3;
 
     /* If specified, the endpoint will use optimistic locking instead of last
      * write wins. This should be set to the current version on entity. */
     google.protobuf.Int32Value lock_version = 4;
 
-    /* If specified, instrument-specific validation checks will be performed */
+    /* If specified, instrument-specific validation checks will be performed. */
     cfhtapi.types.InstrumentType instrument = 5;
 }
 
@@ -42,7 +45,7 @@ message TargetUpdateResponse {
 }
 
 message TargetListRequest {
-    // Unique identifier the science program.
+    // Unique identifier for the science program.
     string runid = 1;
 
     enum TargetType {
@@ -62,10 +65,10 @@ message TargetListResponse {
 }
 
 message TargetShowRequest {
-    // Unique identifier your science program.
+    // Unique identifier of the science program.
     string runid = 1;
 
-    /* Unique identifier of the target. */
+    // Unique identifier of the target.
     string token = 2;
 }
 
@@ -76,10 +79,10 @@ message TargetShowResponse {
 }
 
 message TargetDeleteRequest {
-    // Unique identifier your science program.
+    // Unique identifier of the science program.
     string runid = 1;
 
-    /* Unique identifier of the target. */
+    // Unique identifier of the target.
     string token = 2;
 }
 
@@ -89,8 +92,7 @@ message TargetDeleteResponse {
 }
 
 message EphemeridesUpdateRequest {
-
-    // Unique identifier your science program.
+    // Unique identifier of the science program.
     string runid = 1;
 
     // Unique identifier of the target.
@@ -115,7 +117,6 @@ service TargetService {
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create or update the specified target.";
-            description: "Creates or updates a target.";
         };
     }
 
@@ -125,8 +126,7 @@ service TargetService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Lists all targets for the specified program.";
-            description: "Returns a list of targets.";
+            summary: "List all targets for the specified program.";
         };
     }
 
@@ -137,7 +137,6 @@ service TargetService {
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Show details of the specified target.";
-            description: "Returns details on given target.";
         };
     }
 
@@ -147,8 +146,7 @@ service TargetService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Deletes the specified target.";
-            description: "Deletes the given target.";
+            summary: "Delete the specified target.";
         };
     }
 
@@ -159,8 +157,7 @@ service TargetService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}targets/{token}/ephemerides";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Updates the ephemerides for the specified target.";
-            description: "Updates the given target's ephemerides.";
+            summary: "Update the ephemerides for the specified target.";
         };
     }
 }

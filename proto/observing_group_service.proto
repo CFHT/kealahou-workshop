@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package cfhtapi.observing;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/piapi";
+option java_package = "edu.hawaii.cfht.protos.observing.piapi";
+option java_outer_classname = "ObservingGroupServiceProtos";
+option java_multiple_files = true;
+option java_generic_services = true;
+
+import "cfhtapi/http.proto";
+import "cfhtapi/observing/persistence/snr_block_data.proto";
+import "cfhtapi/observing/persistence/observing_group_data.proto";
+import "cfhtapi/observing/persistence/observing_template_data.proto";
+import "cfhtapi/observing/persistence/target_data.proto";
+import "protoc_gen_openapiv2/options/annotations.proto";
+import "cfhtapi/options.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+
+message ObservingGroupUpdateRequest {
+    // Unique identifier of the science program.
+    string runid = 1;
+
+    /* Unique identifier of the observing group. If an observing group target
+     * with this token already exists, it will be updated, otherwise it will be
+     * created.
+     *
+     * Must begin with the program token followed by a dash, e.g.
+     * 20AE01-0123456789 */
+    string token = 2;
+
+    // Observing group data to be created or updated.
+    cfhtapi.observing.persistence.ObservingGroupData entity = 10;
+
+    /* If creating or updating targets with this request, set the data here.
+      *
+      * Key is the unique identifier of the target and must be prefixed with the runid.
+      * Value is the target data and must be valid. Otherwise, the whole request will fail.
+      *
+      * Observing components can then reference the unique identifier (the map key) in this same request. */
+    map<string, cfhtapi.observing.persistence.TargetData> target = 8;
+
+    /* If creating or updating observing templates with this request, set the data here.
+     *
+     * Key is the unique identifier of the observing template and must be prefixed with the runid.
+     * Value is the observing template data and must be valid. Otherwise, the whole request will fail.
+     *
+     * Observing components can then reference the unique identifier (the map key) in this same request. */
+    map<string, cfhtapi.observing.persistence.ObservingTemplateData> observing_template = 9;
+
+    /* If specified, the endpoint will use optimistic locking instead of last
+     * write wins. This should be set to the current version on entity. */
+    google.protobuf.Int32Value lock_version = 11;
+}
+
+message ObservingGroupUpdateResponse {
+    bool success = 1;
+
+    cfhtapi.http.Errors error = 2;
+
+    cfhtapi.observing.persistence.ObservingGroupData entity = 3;
+}
+
+message ObservingGroupListRequest {
+    // Unique identifier of the science program.
+    string runid = 1;
+}
+
+message ObservingGroupListResponse {
+    bool success = 1;
+
+    repeated cfhtapi.observing.persistence.ObservingGroupData entity = 2;
+
+    cfhtapi.http.Errors error = 3;
+}
+
+message ObservingGroupDeleteRequest {
+    // Unique identifier of the science program.
+    string runid = 1;
+
+    // Unique identifier of the observing group.
+    string token = 2;
+}
+
+message ObservingGroupDeleteResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+}
+
+message SnrBlockListRequest {
+    // Unique identifier of the science program.
+    string runid = 1;
+}
+
+message SnrBlockListResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+    repeated cfhtapi.observing.persistence.SnrBlockData entity = 3;
+}
+
+message AddSingleToSnrBlockRequest {
+    // Unique identifier of the science program.
+    string runid = 1;
+
+    /* Unique identifier of an existing SNR block to create the new observing
+     * group for. */
+    string snr_block_token = 2;
+
+    /* Unique identifier of the observing group. If an observing group target
+     * with this token already exists, it will be updated, otherwise it will be
+     * created.
+     *
+     * Must begin with the program token followed by a dash, e.g.
+     * 20AE01-0123456789 */
+    string observing_group_token = 3;
+}
+
+message AddSingleToSnrBlockResponse {
+    bool success = 1;
+    cfhtapi.http.Errors error = 2;
+    cfhtapi.observing.persistence.SnrBlockData snr_block = 3;
+    cfhtapi.observing.persistence.ObservingGroupData observing_group = 4;
+}
+
+service ObservingGroupServiceProto {
+    rpc CreateOrUpdateObservingGroup (ObservingGroupUpdateRequest) returns (ObservingGroupUpdateResponse) {
+        option (google.api.http) = {
+            put: "/programs/{runid}/observing-groups/{token}"
+            body: "*"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}observing-groups/{token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create or update the specified target.";
+        };
+    }
+
+    rpc ListObservingGroups (ObservingGroupListRequest) returns (ObservingGroupListResponse) {
+        option (google.api.http) = {
+            get: "/programs/{runid}/observing-groups"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}observing-groups";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "List observing groups.";
+            description: "List all observing groups for the specified program.";
+        };
+    }
+
+    rpc DeleteObservingGroup (ObservingGroupDeleteRequest) returns (ObservingGroupDeleteResponse) {
+        option (google.api.http) = {
+            delete: "/programs/{runid}/observing-groups/{token}"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}observing-groups/{token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Delete the specified observing group.";
+        };
+    }
+
+    rpc ListSnrBlocks (SnrBlockListRequest) returns (SnrBlockListResponse) {
+        option (google.api.http) = {
+            get: "/programs/{runid}/snr-blocks"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}snr-blocks";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "List all SNR blocks for the specified program.";
+        };
+    }
+
+    rpc AddSingleToSnrBlock (AddSingleToSnrBlockRequest) returns (AddSingleToSnrBlockResponse) {
+        option (google.api.http) = {
+            put: "/programs/{runid}/snr-blocks/{snr_block_token}"
+            body: "*"
+        };
+        option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}snr-blocks/{snr_block_token}";
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Create an observing group for a single extra observation of the specified SNR block.";
+            description: "Creates a new observing group, consisting of a single observation repeating the last exposure currently taken for the specified SNR block.";
+        };
+    }
+}

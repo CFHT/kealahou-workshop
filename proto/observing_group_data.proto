@@ -1,0 +1,394 @@
+syntax = "proto3";
+
+package cfhtapi.observing.persistence;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/persistence";
+option java_package = "edu.hawaii.cfht.protos.observing.persistence";
+option java_outer_classname = "ObservingGroupProtos";
+option java_generic_services = true;
+
+import "cfhtapi/observing/persistence/subtotals.proto";
+import "cfhtapi/observing/persistence/time_accounting_data.proto";
+import "cfhtapi/options.proto";
+import "cfhtapi/types.proto";
+
+
+enum ObservingGroupPriority {
+    UNKNOWN_OG_PRIORITY = 0;
+    HIGH = 1;
+    MEDIUM = 2;
+    LOW = 3;
+
+    // Don't Observe
+    INACTIVE = 4;
+}
+
+/* An observing group ties together a block of observations with scheduling
+ * constraints. It can also contain configuration details for observing multiple
+ * iterations of that block.
+ *
+ * The configuration gets "rendered out" on creation/update into a sequence of
+ * observing blocks and corresponding observing block conditions which drive
+ * individual observations. */
+message ObservingGroupData {
+
+    // See TimeAccountingStatus for more info.
+    enum ObservingGroupState {
+        NOT_STARTED = 0;
+        OBSERVED = 1;
+        STARTED = 2;
+        VALIDATED = 3;
+    }
+
+    /* An observing block is a collection of observations expected to be
+     * observed together.
+     *
+     * These are typically observed consecutively, in the specified order,
+     * however this is not guaranteed, as repeat exposures may need to be taken
+     * at a later point due to poor conditions.
+     *
+     * When multiple observations are in the same observing block, this signals
+     * that the observations are not of scientific value unless the entire block
+     * is successfully completed. For details, see TimeAccountingData. */
+    message ObservingBlock {
+
+        /* An observing component ties together a target with observation
+         * details.
+         *
+         * Each observing component roughly corresponds with one observation,
+         * although this may actually be multiple exposures depending on how the
+         * observing template has been configured e.g. for a polar sequence
+         * or multiple sequences.
+         *
+         * When there are multiple exposures in one observing component, they
+         * will typically be observed consecutively, in the specified order,
+         * however this is not guaranteed, as repeat exposures may need to be
+         * taken at a later point due to poor conditions. */
+        message ObservingComponent {
+
+            /* Unique identifier of the target used in this observing component.
+             *
+             * When creating or updating an observing group, this must be an
+             * existing target, or on the map of the request to be created. */
+            string target_token = 1;
+
+            /* Unique identifier of the observing template used in this
+             * observing component.
+             *
+             * When creating or updating an observing group, this must be an
+             * existing observing template, or on the map of the request to be
+             * created. */
+            string observing_template_token = 2;
+
+            /* Label of the target used in this observing component.
+             * This value is only set on the read_observing_block.
+             *
+             * api_visibility: read only */
+            int32 target_label = 3 [(cfhtapi.options.api_visibility) = 5];
+
+            /* Label of the observing template used in this observing component.
+             * This value is only set on the read_observing_block.
+             *
+             * api_visibility: read only */
+            int32 observing_template_label = 4 [(cfhtapi.options.api_visibility) = 5];
+
+            /* Unique identifier of the SNR block used in this observing
+             * component, if any. Must be set if and only if the observing
+             * component uses a MegaCam cumulative SNR mode observing template.
+             *
+             * If this is set when creating or updating an observing group,
+             * the observing component will be tied to the SNR block with this
+             * token if it already exists, otherwise a new SNR block will be
+             * created using this token. */
+            string snr_block_token = 5;
+        }
+
+        // List of observing components that comprise this observing block.
+        repeated ObservingComponent observing_component = 1;
+
+        /* Unique identifier for the observing block.
+         *
+         * api_visibility: operations read only */
+        string token = 2 [(cfhtapi.options.api_visibility) = 4];
+
+        /* Index of the observing block within the program, set by the system
+         * automatically. Used for reference in communications with QSO staff.
+         *
+         * storage: transient
+         * api_visibility: read only */
+        int32 label = 3 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+    }
+
+    // Unique identifier for the observing group.
+    string token = 1 [(cfhtapi.options.storage) = TRANSIENT];
+
+    /* Index of the observing group within the program, set by the system
+     * automatically. Used for reference in communications with QSO staff.
+     *
+     * storage: transient
+     * api_visibility: read only */
+    int32 label = 2 [(cfhtapi.options.storage) = TRANSIENT];
+
+    /* Priority of observing this observing group, relative to other observing
+     * groups within the same program. */
+    ObservingGroupPriority og_priority = 3;
+
+    /* This configuration is used to drive the observing blocks on the observing
+     * group, and how they relate to one another. */
+    oneof configuration {
+        // The observing group has a single observing block.
+        SingleObservingGroup single_observing_group = 4;
+
+        /* The observing group has multiple observing blocks driven by target
+         * monitoring constraints. */
+        TargetMonitoringObservingGroup target_monitoring_observing_group = 5;
+
+        /* The observing group multiple observing blocks driven by a phase
+         * schedule. */
+        PhaseScheduleObservingGroup phase_schedule_observing_group = 6;
+    }
+
+    /* The observing blocks that have been created based on the entered
+     * configuration.
+     *
+     * api_visibility: read only */
+    repeated ObservingBlock read_observing_block = 7 [(cfhtapi.options.api_visibility) = 5];
+
+    /* The requirements that have been set for observing each observing blocks
+     * based on the entered configuration.
+     *
+     * api_visibility: read only */
+    map<int32, ObservingBlockCondition> observing_block_condition = 11 [(cfhtapi.options.api_visibility) = 5];
+
+    /* This field is unused, please ignore.
+     *
+     * api_visibility: read only */
+    int32 minimum_observing_block_count = 12 [(cfhtapi.options.api_visibility) = 5];
+
+    /* Time accounting information for the observing group.
+     *
+     * See the Time Accounting documentation for more details.
+     *
+     * api_visibility: readonly */
+    TimeAccountingData time_accounting = 21 [(cfhtapi.options.api_visibility) = 5];
+
+    // State of the observing group, based off of the time accounting status.
+    ObservingGroupState state = 15;
+
+    /* Increments when this object updates.
+     *
+     * storage: transient
+     * api_visibility: read only, incremented by the server */
+    int32 version = 16 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+
+    /* Conditions the observation of this observing group on the observation of
+     * another observing group first. */
+    LegacyReel legacy_reel = 17;
+
+    /* Constraints on when the observing group can be observed. */
+    TimeConstraint time_constraint = 20;
+
+    /* This can be used to configure calibration observing groups. For internal
+     * use only.
+     *
+     * api_visibility: operations write only */
+    cfhtapi.types.ExposureType target_type = 30 [(cfhtapi.options.api_visibility) = 12];
+
+    enum DitherScheme {
+
+        // The observing group does not use dither patterns.
+        NONE = 0;
+
+        /* Dither patterns in the observing group are observed in standard
+         * order, one target at a time across all dither positions.
+         *
+         * e.g. 1-2-3-4-1-2-3-4 */
+        STANDARD = 1;
+
+        /* Dither patterns in the observing group are observed one dither
+         * position at a time across all targets.
+         *
+         * e.g. 1-1-2-2-3-3-4-4 */
+        GROUP = 2;
+    }
+
+    /* Used to customize the order of observation when observing multiple
+     * targets with the same telescope pattern within this observing group. */
+    DitherScheme dither_scheme = 31;
+
+    // Indicates the observing group uses low surface brightness (LSB) mode.with
+    bool low_surface_brightness = 32;
+}
+
+/* A constraint indicating that a "linked" observing group must be observed
+ * before this observing group. */
+message LegacyReel {
+    // Token of the linked observing group.
+    string reel_og_token = 1;
+
+    /* Required wait after the observation of the linked observing group before
+     * this observing group can be observed. */
+    cfhtapi.types.Duration delay = 2;
+
+    /* Maximum allowed wait after the delay until this observing group can no
+     * longer be observed. */
+    cfhtapi.types.Duration window = 3;
+
+    /* Label of the observing group which must be observed before this one.
+     *
+     * storage: transient
+     * api_visibility: read only */
+    int32 reel_og_label = 4 [(cfhtapi.options.storage) = TRANSIENT, (cfhtapi.options.api_visibility) = 5];
+}
+
+/* An observing group consisting of one observing block.
+ *
+ * Contingencies on other observations can be set through legacy_reel.
+ * Constraints on the time of observation can be set through time_constraint. */
+message SingleObservingGroup {
+    ObservingGroupData.ObservingBlock observing_block = 1;
+}
+
+/* An observing group consisting of a single observing block and observation
+ * windows defined by a phase schedule.
+ *
+ * Used for an observing block that needs to be observed once, with possible
+ * observation windows that occur with a regular period. */
+message PhaseScheduleObservingGroup {
+    message PhaseSchedule {
+        // The earliest moment to observe, in Unix time milliseconds.
+        int64 earliest_observe_date_millis = 1;
+
+        /* The amount of time before or after earliest_observe_date_millis that
+         * the initial observation can be made. */
+        cfhtapi.types.Duration tolerance = 2;
+
+        // The amount of time to wait between each iteration.
+        cfhtapi.types.Duration period = 3;
+
+        /* The amount of time before or after the period that each iteration
+         * can be made. */
+        cfhtapi.types.Duration period_tolerance = 4;
+    }
+
+    // The observing block that is added once per iteration.
+    ObservingGroupData.ObservingBlock observing_block = 1;
+
+    // The schedule that defines when each iteration can occur.
+    PhaseSchedule phase_schedule = 2;
+}
+
+/* An observing group defined by an observing block, a number of iterations, and
+ * schedule constraints on the iterations.
+ *
+ * Used for observations that need to be repeated with a regular period.
+ *
+ * One copy of the observing block is added to the observing group for each
+ * iteration. */
+message TargetMonitoringObservingGroup {
+    message TimeConstraint {
+        // How many observations to take.
+        int32 number_of_iterations = 1;
+
+        /* Minimum number of observations which still provides science value.
+         *
+         * If weather becomes an issue, this is used to determine if additional
+         * observations should be tried, or the whole observing group aborted
+         * to prioritize other observations.
+         *
+         * Cannot be greater than requested number of iterations. */
+        int32 minimum_number_of_iterations = 2;
+
+        // The time interval between observations.
+        cfhtapi.types.Duration time_interval = 3;
+
+        /* How much earlier an iteration can be observed before the time
+         * interval has elapsed.
+         *
+         * At least one of tolerance before or after must be non-zero. */
+        cfhtapi.types.Duration time_interval_tolerance_min = 4;
+
+        /* How much later an iteration can be observed after the time interval
+         * has elapsed.
+         *
+         * At least one of tolerance before or after must be non-zero. */
+        cfhtapi.types.Duration time_interval_tolerance_max = 5;
+
+        /* Time the observing group should start being observed, in Unix time
+         * milliseconds.
+         *
+         * If omitted, CFHT will start observing at the QC's discretion. */
+        int64 t0_millis = 6;
+
+        // Whether all iterations need to occur within the same camera run.
+        bool within_same_camera_run = 10;
+    }
+
+    // The observing block that is added once per iteration.
+    ObservingGroupData.ObservingBlock observing_block = 1;
+
+    // The schedule that defines when each iteration can occur.
+    TimeConstraint time_constraint = 2;
+}
+
+// Constraints on when an observation can be made.
+message TimeConstraint {
+    /* Time windows during which the observation can be made.
+     *
+     * Windows can not overlap, and will always be stored in temporal order. */
+    repeated ObservingBlockCondition.Window window = 1;
+}
+
+
+/* Set of requirements that must be met for an observing block to be observed.
+ *
+ * This is compiled from the observing group configuration details into each of
+ * the observing blocks, and used to store the requirements corresponding to
+ * each one. */
+message ObservingBlockCondition {
+    /* A constraint indicating that another observing block must be observed
+     * before this observing block. */
+    message Requisite {
+
+        /* This should match the index of the observing block in the
+         * read_observing_block list. */
+        int32 requisite_observing_block_index = 11;
+
+        /* Minimum time to wait after requisite observing block exposure has
+         * been taken. */
+        int64 wait_period_min_millis = 3;
+
+        /* Optimal to wait after requisite observing block exposure has
+         * been taken. */
+        int64 wait_period_millis = 12;
+
+        oneof wait_max {
+            /* Minimum time to wait after requisite observing block exposure has
+             * been taken. */
+            int64 wait_period_max_millis = 4;
+
+            /* If this observation can happen any time after the requisite. */
+            bool unbounded = 5;
+        }
+    }
+
+    // A time window during which an observation can be made.
+    message Window {
+        // Start of the observation window, in Unix time milliseconds.
+        int64 observe_after = 5;
+
+        // End of the observation window, in Unix time milliseconds.
+        int64 observe_before = 6;
+    }
+
+    /* Pre-requisite conditions before each observing block can be started.
+     * The index of items in this list corresponds directly to the index of the
+     * observing block on the observing group i.e. this list is one-to-one with
+     * read_observing_block. */
+    repeated Requisite pre_requisite = 1;
+
+    /* Time windows during which the observing block can be observed.
+     *
+     * Windows can not overlap, and will always be stored in temporal order. */
+    repeated Window window = 2;
+}

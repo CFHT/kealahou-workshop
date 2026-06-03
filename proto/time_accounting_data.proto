@@ -1,0 +1,233 @@
+syntax = "proto3";
+
+package cfhtapi.observing.persistence;
+// https://github.com/golang/protobuf
+option go_package = "cfhtapi/observing/persistence";
+option java_package = "edu.hawaii.cfht.protos.observing.persistence";
+option java_outer_classname = "TimeAccountingDataProtos";
+
+import "cfhtapi/options.proto";
+import "protoc_gen_openapiv2/options/annotations.proto";
+
+/* Provides information about the time configured, time spent observing, and
+ * overall progress of an entity configured for observation.
+ *
+ * The entities with TimeAccountingData data are:
+ *   * Observing Blocks
+ *   * Observing Groups
+ *   * Science Programs
+ *
+ * All fields in TimeAccountingData are readonly because they are derived from
+ * the entity and its associated exposures. */
+message TimeAccountingData {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+       json_schema: {
+           title: "Time Accounting"
+           description: "Specific fields for tracking observatory time usage by a scientific program.\n"
+               "\n"
+               "Each field is an object that belongs to an entity which describes a series of exposures."
+           read_only: true
+       }
+    };
+
+    /* Lifecycle states that entities transition through. */
+    enum TimeAccountingStatus {
+
+        /* No exposures configured for the entity have been observed. */
+        NOT_STARTED = 0;
+
+        /* Some, but not all exposures configured for the entity have been observed. */
+        STARTED = 1;
+
+        /* All exposures configured for the entity have been observed,
+         * but at least one does not have a corresponding validated exposure.
+         *
+         * Observing blocks containing polar sequences require a set of
+         * exposures from the same night to be counted here. */
+        OBSERVED = 2;
+
+        /* All exposures configured for the entity have a corresponding validated exposure.
+         *
+         * Observing blocks containing polar sequences require a set of
+         * validated exposures from the same night to be counted here. */
+        VALIDATED = 3;
+    }
+
+    TargetTimeData configured_time = 1 [
+        (cfhtapi.options.api_visibility) = 5,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The TargetTimeData for all exposures requested for this entity.\n"
+                "\n"
+                "This will always have a view of REQUESTED, with actual_integration_time unset.\n"
+                "\n"
+                "For observing groups, if the priority is set to inactive, this "
+                "will not contribute to the total for the program it belongs to."
+            read_only: true
+        }
+    ];
+
+    TargetTimeData charged_time = 2 [
+        (cfhtapi.options.api_visibility) = 5,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The amount of time charged to the science program for this entity."
+                "\n"
+                "For programs or observing groups, this is just the sum of the charged_time of their child entities."
+                "\n"
+                "For observing blocks, up to one validated exposure is counted per configured exposure. "
+                "The charged time is set to zero unless the observing block itself is validated. "
+                "If the observing block contains a polar sequence, it requires a set of validated exposures from the same night."
+                "\n"
+                "Default view is REQUESTED."
+            read_only: true
+        }
+    ];
+
+    TargetTimeData validated_time_on_sky = 3 [
+        (cfhtapi.options.api_visibility) = 4,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The TargetTimeData for all validated exposures, including repeats.\n"
+                "\n"
+                "Default view is ACTUAL."
+            read_only: true
+        }
+    ];
+
+    TargetTimeData time_on_sky = 4 [
+        (cfhtapi.options.api_visibility) = 4,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The TargetTimeData for all observed exposures, including repeats.\n"
+                "\n"
+                "Default view is ACTUAL."
+            read_only: true
+        }
+    ];
+
+    TimeAccountingStatus time_accounting_status = 5 [
+        (cfhtapi.options.api_visibility) = 5,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Lifecycle state this entity is in."
+            read_only: true
+        }
+    ];
+
+    double completion_ratio = 6 [
+        (cfhtapi.options.api_visibility) = 5,
+        (cfhtapi.options.storage) = TRANSIENT,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Entity completion ratio, representing how much of the time configured has been charged.\n"
+            "\n"
+            "Equal to total charged time (as requested) divided by total configured time. "
+            "For programs, if the total configured time is greater than the time allocated to the program, "
+            "we divide by the time allocated instead."
+            "\n"
+            "Note that if a program has INACTIVE observing groups that already have charged time, "
+            "this could result in an inflated value here."
+            read_only: true
+            minimum: 0,
+            maximum: 1,
+        }
+    ];
+}
+
+message ITimeData {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Integration Time"
+            description: "Splits integration time into exposure time and overhead time.\n"
+                "The sum of these two values is the total integration time."
+            read_only: true
+        }
+    };
+
+    int64 exposure_time_millis = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Time spent collecting photons (in milliseconds)."
+            read_only: true
+        }
+    ];
+
+    int64 overhead_time_millis = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "All other times required for taking the exposure (in milliseconds)."
+            read_only: true
+        }
+    ];
+}
+
+message TargetTimeData {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+        json_schema: {
+            title: "Target Time"
+            description: "Contains the requested integration time and actual integration time.\n"
+            read_only: true
+        }
+    };
+
+
+    /* Indicates which ITime the callers should prefer when reporting a singular ITime. */
+    enum View {
+
+        /* Prefer the requested_integration_time when reporting a singular ITime. */
+        REQUESTED = 0;
+
+        /* Prefer the actual_integration_time when reporting a singular ITime. */
+        ACTUAL = 1;
+    }
+
+    ITimeData requested_integration_time = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Integration time requested on exposures, as configured in K2."
+            read_only: true
+        }
+    ];
+
+    ITimeData actual_integration_time = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Integration time actually spent on sky."
+                "\n"
+                "This could differ from the requested time for several reasons, such as:\n"
+                "* SNR caused an etime to go longer or shorter based on conditions\n"
+                "* The RO pushed the stop button and allowed the readout of a partial exposure to complete\n"
+                "* The requested etime did not fit in the expected frame size, and was extended by another part of the system\n"
+                "* Normal variation in shutter movement can cause sub-second variations in exposure times\n"
+                "\n"
+                "If the entity has been requested but not observed, this field will be unset."
+            read_only: true
+        }
+    ];
+
+    View view = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Which time clients should prefer showing users when presenting a single integration time for this data.\n"
+                "\n"
+                "REQUESTED - prefer requested_integration_time\n"
+                "ACTUAL - prefer actual_integration_time"
+            read_only: true
+        }
+    ];
+
+    int32 exposure_count = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The total number of exposures represented by the values here.\n"
+                "\n"
+                "This value is the same for both views."
+            read_only: true
+        }
+    ];
+
+    int32 child_count = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The total number of child entities represented by the values here.\n"
+                "\n"
+                "If this is a program, these are observing groups.\n"
+                "If this is an observing group, these are observing blocks.\n"
+                "If this is an observing block, these are exposures.\n"
+                "\n"
+                "Useful for e.g. seeing the number of iterations configured"
+                "or completed on an Observing Group."
+                "\n"
+                "This value is the same for both views."
+            read_only: true
+        }
+    ];
+}
