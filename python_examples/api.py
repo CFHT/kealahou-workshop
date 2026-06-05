@@ -7,35 +7,33 @@ import json
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-from python_examples.config import access_token, vverbose, verbose, api_url
+from . import config
 
 
 def api_request(endpoint, data=None, method='GET'):
     """
     Submit a request to the Kealahou API, and condense any errors into a consistent error message format.
-
-    Params:
-    endpoint - String Added to the API url
-    data - JSON for additional variables.
-    method - Default GET, but also available for POST and DELETE.
-
-    Returns:
-        response as JSON format.
+    :param endpoint: Path for the desired method to append to the base URL
+    :param data: Data to send in the request
+    :param method: HTTP method to use for the specified endpoint
+    :return: Response
+    :raise: Exception with a simple message describing what went wrong
     """
 
     if data is None:
         data = {}
+
     headers = {
-        'Authorization': f'Bearer {access_token}',
+        'Authorization': f'Bearer {config.access_token}',
         'Content-Type': 'application/json',
     }
 
-    url = f'{api_url}/{endpoint}'
+    url = f'{config.api_url}/{endpoint}'
 
-    if verbose or vverbose:
-        print(f"Request\n full URL: {url}")
+    if config.vverbose:
+        print(f"Request")
+        print(f"URL: {url}")
         print(f"Data: {data}")
-        print(f"Headers: {headers}")
         print("#" * 80)
 
     request = Request(url, json.dumps(data).encode('utf-8'), headers, method=method)
@@ -51,6 +49,9 @@ def api_request(endpoint, data=None, method='GET'):
     else:
         response = json.loads(raw_response.read().decode('utf-8'))
 
+    if config.vverbose:
+        print(f"Response: {json.dumps(response, indent=4, default=lambda val: "")}")
+
     if response.get('success'):
         return response
     elif response.get('error') and response['error']['messages']:
@@ -61,23 +62,34 @@ def api_request(endpoint, data=None, method='GET'):
         raise Exception('API request failed, but no error message was given')
 
 
-class EntityCrudApi:
+class EntityReadApi:
     """
-    Wrapper around the Kealahou API CRUD methods for a given program and entity type.
+    Wrapper around the Kealahou API read methods for a given program and entity type.
     """
 
     def __init__(self, program_token: str, entity_type: str):
         self.path_prefix = f'programs/{program_token}/{entity_type}'
 
     def list(self) -> list[dict]:
-        api_response = api_request(f'{self.path_prefix}')
+        api_response = api_request(f'{self.path_prefix}', method='GET')
         return api_response['entity']
 
     def show(self, token: str) -> dict:
-        api_response = api_request(f'{self.path_prefix}/{token}')
+        api_response = api_request(f'{self.path_prefix}/{token}', method='GET')
         return api_response['entity']
 
-    def create_or_update(self, entity: dict, request_aux_data: dict = {}) -> dict:
+
+class EntityCrudApi(EntityReadApi):
+    """
+    Wrapper around the Kealahou API CRUD methods for a given program and entity type.
+    """
+
+    def __init__(self, program_token: str, entity_type: str):
+        super().__init__(program_token, entity_type)
+
+    def create_or_update(self, entity: dict, request_aux_data: dict = None) -> dict:
+        if request_aux_data is None:
+            request_aux_data = {}
         version = entity.get('version', None)
         lock_version = {
             'value': version,

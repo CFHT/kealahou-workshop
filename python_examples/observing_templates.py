@@ -1,11 +1,15 @@
 import json
 from typing import Any
 
-from .api import api_request
-from .config import verbose
+from . import config
+from .api import EntityReadApi
+from .constants import entity_desc
+
+get_observing_template_api = lambda program_token: EntityReadApi(program_token, 'observing-templates')
+observing_template_desc = lambda observing_template: entity_desc(observing_template, 'OT')
 
 
-def get_ot_list_example(program_token: str) -> Any:
+def get_observing_template_list_example(program_token: str) -> Any:
     """
     API call prints Observing Templates based
     Params:
@@ -13,14 +17,31 @@ def get_ot_list_example(program_token: str) -> Any:
     Returns:
         Nothing
     """
-    response = api_request(f'programs/{program_token}/observing-templates')
+    api = get_observing_template_api(program_token)
+
+    try:
+        observing_templates = api.list()
+    except Exception as e:
+        print(f"API request to get list of targets failed: {e}")
+        return
+
     print(f'All observing templates for {program_token}:')
-    for ot in response['entity']:
-        print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
-        if verbose:
-            print(json.dumps(ot, indent=4, sort_keys=True))
+    for observing_template in observing_templates:
+        print(observing_template_desc(observing_template))
+        if config.verbose:
+            print(json.dumps(observing_template, indent=4))
     print()
 
-    ot_out = response['entity'][0]
 
-    return ot_out
+def get_observing_template_by_index(program_token: str, idx=0):
+    api = get_observing_template_api(program_token)
+    try:
+        observing_templates = api.list()
+    except Exception as e:
+        print(f"API request to get list of observing templates failed: {e}")
+        return None
+    try:
+        return observing_templates[idx]
+    except IndexError:
+        print(f"No observing template at index {idx}")
+        return None

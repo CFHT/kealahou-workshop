@@ -10,11 +10,11 @@ import sys
 
 from python_examples import config
 from python_examples.exposures import get_exposure_list_example
-from python_examples.observing_groups import get_og_list_example, set_og_example, delete_og_example
-from python_examples.observing_templates import get_ot_list_example
+from python_examples.observing_groups import get_og_list_example, create_og_example, delete_og_example
+from python_examples.observing_templates import get_observing_template_list_example, get_observing_template_by_index
 from python_examples.programs import get_first_program_example, get_program_list_example
 from python_examples.targets import get_megacam_default_pointing_offset_example, get_target_list_example, \
-    create_target_example, delete_target_example, get_target_example
+    create_target_example, delete_target_example, get_target_by_index
 
 KEY_FILE = '.access_token'
 BASE_URL = 'https://api-stage.cfht.hawaii.edu'
@@ -26,8 +26,8 @@ example_list = [
     'Add a target',
     'Delete a target',
     'Show observing groups',
-    'Add observing groups',
-    'Delete observing groups',
+    'Add an observing group',
+    'Delete an observing group',
     'Show observing templates',
     'Show exposures taken',
 ]
@@ -81,35 +81,38 @@ def main():
         print(f"Failed to load API access token file: {args.token_file}. Check path and file permissions.")
         sys.exit(1)
 
-    config.verbose = args.verbose
+    config.verbose = args.verbose or args.vverbose
     config.vverbose = args.vverbose
     config.api_url = args.api_url
 
     if args.example is not None:
         example = args.example
     else:
-        print("To run a specific example, select a number:")
+        print("To run a specific example, select a number (0 to exit):")
         print(example_description)
         try:
             example = int(input("Select an option: "))
         except ValueError:
             print("Invalid option selected")
             sys.exit()
-        if example < 1 or example > len(example_description):
+        if example == 0:
+            sys.exit()
+        elif example < 1 or example > len(example_description):
             print("Invalid option selected")
             sys.exit()
 
     print("#" * 80)
-    print(f"Chosen example: {example_list[example - 1]}")
+    print(f"Selected example: {example_list[example - 1]}")
     print("#" * 80)
 
-    # Used examples higher than 1: Get Program List.
-    program_id, instrument = get_first_program_example(0)
+    if example > 2:
+        # Used examples higher than 1: Get Program List.
+        program_id, instrument = get_first_program_example(0)
 
-    # Exit if there is no programs to conduct further examples.
-    if example > 2 and program_id is None:
-        print(f"No Programs found. Cannot execute example: {example_list[example - 1]}")
-        sys.exit(0)
+        # Exit if there is no programs to conduct further examples.
+        if not program_id:
+            print(f"No Programs found. Cannot execute example: {example_list[example - 1]}")
+            sys.exit(0)
 
     # Execute API call based on option chosen.
     match example:
@@ -118,23 +121,23 @@ def main():
         case 2:
             get_megacam_default_pointing_offset_example()
         case 3:
-            get_target_list_example(program_id, instrument)
+            get_target_list_example(program_id)
         case 4:
             create_target_example(program_id, instrument, moving_target=True)
         case 5:
-            delete_target_example(program_id, instrument)
+            delete_target_example(program_id)
         case 6:
             get_og_list_example(program_id)
         case 7:
-            target_example = get_target_example(program_id, instrument, 2)
-            ot_example = get_ot_list_example(program_id)
-            set_og_example(program_id, instrument, target_example, ot_example)
+            target_example = get_target_by_index(program_id, 2)
+            ot_example = get_observing_template_by_index(program_id, 0)
+            create_og_example(program_id, instrument, target_example, ot_example)
         case 8:
-            delete_og_example(program_id, instrument)
+            delete_og_example(program_id)
         case 9:
-            get_ot_list_example(program_id)
+            get_observing_template_list_example(program_id)
         case 10:
-            get_exposure_list_example(program_id, instrument)
+            get_exposure_list_example(program_id)
         case _:
             print(f"Unknown option: {example}.")
 

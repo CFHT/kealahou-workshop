@@ -1,11 +1,10 @@
 import json
 
+from . import config
 from .api import api_request
-from .config import verbose
-from .constants import INSTRUMENT
 
 
-def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
+def get_exposure_list_example(program_token: str):
     """
     Example API call to get the list of exposures
 
@@ -26,7 +25,7 @@ def get_exposure_list_example(program_token: str, instrument: INSTRUMENT):
             # f"IQ: {exp['exposure_status']['megacam_status']['elixir_processing_result']['sky_background']} "
         )
         print(s)
-        if verbose:
+        if config.verbose:
             print(json.dumps(exp, indent=4))
     print()
 
