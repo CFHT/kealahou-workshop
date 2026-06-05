@@ -11,18 +11,17 @@ observing_template_desc = lambda observing_template: entity_desc(observing_templ
 
 def get_observing_template_list_example(program_token: str) -> Any:
     """
-    API call prints Observing Templates based
-    Params:
-        program_token: str The token of the select program.
-    Returns:
-        Nothing
+    Lists the observing templates for the specified program.
+
+    Parameters:
+        program_token: The token of the program to list observing templates from.
     """
     api = get_observing_template_api(program_token)
 
     try:
         observing_templates = api.list()
     except Exception as e:
-        print(f"API request to get list of targets failed: {e}")
+        print(f"API request to get list of observing templates failed: {e}")
         return
 
     print(f'All observing templates for {program_token}:')

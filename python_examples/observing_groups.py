@@ -32,61 +32,93 @@ def example_observing_group(program_token, target, observing_template):
 
 def get_og_list_example(program_token: str):
     """
-    Params:
-        program_token: str The token of the select program.
+    Lists the observing groups for the specified program.
 
-        returns: JSON of observing group results
+    Parameters:
+        program_token: The token of the program to list observing groups from.
     """
+
+    print(f"Listing observing groups for program {program_token}")
+
     api = observing_group_api(program_token)
     try:
         observing_groups = api.list()
     except Exception as e:
-        print(f"Getting OGs failed: {e}")
-        sys.exit()
+        print(f"API request to get list of observing groups failed: {e}")
+        return
 
+    print(f'All observing groups for {program_token}:')
     for og in observing_groups:
         print(f"{observing_group_desc(og)}, OG priority: {og['og_priority']}")
         if config.verbose:
             print(json.dumps(og, indent=4))
             print()
-    return observing_groups
 
 
 def create_og_example(program_token, instrument: INSTRUMENT, target, observing_template):
     """
-    Creates a Observing Group via API put call based on given parameters.
-    Prints the response
+    Create an observing group target under the specified program, to be observed with the specified instrument.
+    The observing group will consist of a single observation of the specified target and observing template.
 
-    Params:
-        program_token: str The token of the select program.
-        instrument: A constant string (i.e., MEGACAM).
-        target: str
-        observing_template: JSON str
-
-    Returns:
-        nothing.
+    Parameters:
+        program_token: The token of the program to create a target under.
+        instrument: The instrument the target will be observed with.
+        target: The target to be observed.
+        observing_template: The observing template to be used for observation.
     """
     new_og = example_observing_group(program_token, target, observing_template)
+
     api = observing_group_api(program_token)
-    og = api.create_or_update(new_og)
-    print(
-        f"Created observing group {observing_group_desc(og)} for program {program_token} using {instrument}")
+
+    print(f"Creating {observing_group_desc(new_og)}")
+
+    try:
+        result = api.create_or_update(new_og)
+    except Exception as e:
+        print(f"Problem creating new observing group for {program_token} using {instrument}: {e}.")
+        return
+
+    print(f"Created observing group {observing_group_desc(result)} for program {program_token} using {instrument}")
+    if config.verbose:
+        print(result)
 
 
 def delete_og_example(program_token):
     """
-    Params:
-        program_token: str The token of the select program.
-        instrument: A constant string (i.e., MEGACAM).
-    Returns:
-        Nothing
+    Deletes the latest observing group under the specified program.
+
+    Parameters:
+        program_token: The token of the program to delete an observing group from.
     """
-    ogs = get_og_list_example(program_token)
-    og = ogs[-1]
     api = observing_group_api(program_token)
+
     try:
-        api.delete(og['token'])
-        print(f"Deleted observing group {observing_group_desc(og)}")
+        existing_ogs = api.list()
     except Exception as e:
-        print(f"Observing group deletion failed: {e}")
-    print()
+        print(f"Listing observing groups in {program_token} failed: {e}")
+        return
+
+    print(f"{len(existing_ogs)} observing groups currently on {program_token}")
+
+    try:
+        og_to_delete = existing_ogs[-1]
+    except IndexError:
+        print(f"No observing groups to delete in {program_token}")
+        return
+
+    print(f"Deleting {observing_group_desc(og_to_delete)}")
+
+    try:
+        api.delete(og_to_delete['token'])
+        print(f"{observing_group_desc(og_to_delete)} deleted")
+    except Exception as e:
+        print(f"Problem deleting {observing_group_desc(og_to_delete)}: {e}")
+        return
+
+    remaining_ogs = api.list()
+    print(f"{len(remaining_ogs)} observing groups remain on {program_token}")
+    if config.verbose:
+        print(f"Remaining observing groups: {remaining_ogs}")
+        for observing_group in enumerate(remaining_ogs):
+            print(observing_group)
+            print()

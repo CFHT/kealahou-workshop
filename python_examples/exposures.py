@@ -8,7 +8,7 @@ def get_exposure_list_example(program_token: str):
     """
     Example API call to get the list of exposures
 
-    Params:
+    Parameters:
         program_token: str The token of the select program.
         instrument: A constant string (i.e., MEGACAM).
     Returns:

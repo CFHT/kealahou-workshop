@@ -11,9 +11,10 @@ target_desc = lambda target: entity_desc(target, 'T')
 
 def example_fixed_target(program_token: str, instrument: INSTRUMENT):
     """
-    Generate data for a fixed target under a specified program.
-    Params:
-        program_token: str The token of the program the target will belong to.
+    Generate data for a fixed target under the specified program, to be observed with the specified instrument.
+
+    Parameters:
+        program_token: The token of the program the target will belong to.
         instrument: The instrument the target will be observed with.
     Returns:
         Formatted JSON to be used in an API call to create a single fixed target.
@@ -39,8 +40,9 @@ def example_fixed_target(program_token: str, instrument: INSTRUMENT):
 
 def example_moving_target(program_token: str, instrument: INSTRUMENT):
     """
-    Generate data for a moving target under a specified program.
-    Params:
+    Generate data for a moving target under the specified program, to be observed with the specified instrument.
+
+    Parameters:
         program_token: The token of the program the target will belong to.
         instrument: The instrument the target will be observed with.
     Returns:
@@ -68,14 +70,12 @@ def example_moving_target(program_token: str, instrument: INSTRUMENT):
 
 def create_target_example(program_token: str, instrument: INSTRUMENT, moving_target=False):
     """
-    Creates a target based on the program token, validating using the instrument.
+    Create a target under the specified program, to be observed with the specified instrument.
 
-    Params:
-        program_token: str The token of the select program.
-        instrument: A constant string (i.e., MEGACAM).
+    Parameters:
+        program_token: The token of the program to create a target under.
+        instrument: The instrument the target will be observed with.
         moving_target: Creates a moving target if true, otherwise creates a fixed target.
-    Returns:
-        Nothing
     """
 
     if moving_target:
@@ -93,16 +93,17 @@ def create_target_example(program_token: str, instrument: INSTRUMENT, moving_tar
         print(f"Problem creating new target for {program_token} using {instrument}: {e}.")
         return
 
-    print(f"Target created for program {program_token} using {instrument}.")
+    print(f"Created target {target_desc(result)} for program {program_token} using {instrument}.")
     if config.verbose:
         print(result)
 
 
 def delete_target_example(program_token: str):
     """
-    Deletes the latest target based on the program id.
-    Params:
-        program_token: str The token of the select program.
+    Deletes the latest target under the specified program.
+
+    Parameters:
+        program_token: The token of the program to delete a target from.
     """
     api = target_api(program_token)
 
@@ -124,7 +125,7 @@ def delete_target_example(program_token: str):
 
     try:
         api.delete(target_to_delete['token'])
-        print(f"Target {target_desc(target_to_delete)} deleted")
+        print(f"{target_desc(target_to_delete)} deleted")
     except Exception as e:
         print(f"Problem deleting {target_desc(target_to_delete)}: {e}")
         return
@@ -140,7 +141,10 @@ def delete_target_example(program_token: str):
 
 def get_target_list_example(program_token: str):
     """
-    Prints a target list from a single program.
+    Lists the targets for the specified program.
+
+    Parameters:
+        program_token: The token of the program to list targets from.
     """
 
     print(f"Listing targets for program {program_token}")
@@ -176,9 +180,7 @@ def get_target_by_index(program_token: str, idx=0):
 
 def get_megacam_default_pointing_offset_example():
     """
-    List the system-defined pointing offsets for MEGACAM
-
-    Prints JSON attributes
+    List the system-defined pointing offsets for MEGACAM.
     """
     instrument = 'MEGACAM'
     response = api_request('pointing_offset', data={
@@ -190,6 +192,10 @@ def get_megacam_default_pointing_offset_example():
     if offsets:
         print(f"Pointing Offsets for {instrument}:")
         for offset in offsets:
-            print(offset)
+            offset_ra = offset['offset'].get('ra_offset', 0)
+            offset_dec = offset['offset'].get('dec_offset', 0)
+            print(f"{entity_desc(offset, '')} - ({offset_ra}, {offset_dec})")
+            if config.verbose:
+                print(offset)
     else:
-        print(f"No default pointing offsets found.")
+        print(f"No pointing offsets found.")
