@@ -111,7 +111,7 @@ program_token = '24B123' # Add a Program id
 url = f"https://api-stage.cfht.hawaii.edu/programs/{program_token}/observing-templates"
 request = Request(url, None, headers, method='GET')
 response = json.loads(urlopen(request).read().decode('utf-8'))
-for ot in response['observing_template']:
+for ot in response['entity']:
     print(f"OT{ot['label']} - {ot['name']}")
     
 ``` 

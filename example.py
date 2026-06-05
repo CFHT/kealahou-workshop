@@ -270,10 +270,10 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
     # List observing templates
     response = api_request(f'programs/{program_token}/observing-templates')
     print(f'All observing templates for {program_token}:')
-    for ot in response['observing_template']:
+    for ot in response['entity']:
         print(f"OT{ot['label']} - {ot['name']} [token = {ot['token']}]")
     print()
-    first_ot = response['observing_template'][0]  # Save for later example
+    first_ot = response['entity'][0]  # Save for later example
 
     # Create new target
     target_api = EntityCrudApi(program_token, 'targets')
@@ -294,9 +294,9 @@ def k2_example_walkthrough(program_token: str, instrument: INSTRUMENT):
         },
     }
     response = api_request(f"programs/{program_token}/observing-groups/{new_og['token']}", method='PUT', data={
-        'observing_group': new_og,
+        'entity': new_og,
     })
-    og = response['observing_group']
+    og = response['entity']
     print(f"Created observing group OG{og['label']} [token = {og['token']}]")
     print()
 

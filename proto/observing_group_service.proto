@@ -132,7 +132,7 @@ service ObservingGroupService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}observing-groups/{token}";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create or update the specified target.";
+            summary: "Create or update the specified observing group.";
         };
     }
 
@@ -142,8 +142,7 @@ service ObservingGroupService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}observing-groups";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "List observing groups.";
-            description: "List all observing groups for the specified program.";
+            summary: "List all observing groups for the specified program.";
         };
     }
 
@@ -174,7 +173,7 @@ service ObservingGroupService {
         };
         option (cfhtapi.options.jersey_path) = "/{runid:(?:programs/(\\d\\d\\w\\w\\d\\d)/)?}snr-blocks/{snr_block_token}";
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            summary: "Create an observing group for a single extra observation of the specified SNR block.";
+            summary: "Create an observing group for an additional observation of the specified SNR block.";
             description: "Creates a new observing group, consisting of a single observation repeating the last exposure currently taken for the specified SNR block.";
         };
     }
